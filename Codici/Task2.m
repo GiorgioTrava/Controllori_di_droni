@@ -22,3 +22,15 @@ bode(SYS)
 grid on, hold on
 bode(G)
 legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+
+% %% Frequency response function
+% 
+% SYSresponse = ufrd(SYS,logspace(-2,2,100))  
+% 
+% figure (3)
+% bode(SYSresponse)
+% grid on, hold on
+% bode(G)
+% legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+
+poliezeri = zpk(SYS)
