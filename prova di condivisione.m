@@ -6,10 +6,4 @@
 
 
 
-
-
-%la madonna ci protegga!!!!!!!!!!!!!!!!!!!!!!!!
-clear all
-
-sti cazzi
-
+%QUESTA è LA MIA MODIFICA A PROVA
