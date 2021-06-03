@@ -16,6 +16,6 @@ In questo modo ciascuno può proporre le proprie modifiche indipendentemente che
 
 Quando ci troviamo confrontimo le modifiche e se le approviamo mergiamo il branch con il main.
 
-NOTA: ricordarsi di fare fetch origin ogni volta che si inizia a lavorare per mettersi al pari con i cambiamenti
+NOTA: ricordarsi di fare fetch_origin e pull_origin ogni volta che si inizia a lavorare per mettersi al pari con i cambiamenti
 
 
