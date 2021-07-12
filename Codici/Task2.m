@@ -1,6 +1,6 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
-clc, clear, close all
+clc, clear
 
 run Task1
 

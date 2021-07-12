@@ -36,7 +36,7 @@ denominatore_2 = [1, 2*omega_n_2*epsilon_2, omega_n_2^2];
 G_required_2 = tf(numeratore_2, denominatore_2)
 
 omega_n = 15;
-epsilon = 0.98;
+epsilon = 0.93;
 numeratore = omega_n^2;
 denominatore = [1, 2*omega_n*epsilon, omega_n^2];
 G_required = tf(numeratore, denominatore)
@@ -46,8 +46,10 @@ bode(G_required)
 hold on
 bode(G_required_2, 'r')
 
-Req1 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
-Req2 = TuningGoal.Transient('phi_0','phi',G_required_2, 'step');
+%ReqHard = TuningGoal.Poles('X',mindecay,mindamping,inf);
+%Req2 = TuningGoal.Poles('X',mindecay,mindamping,inf);
+Req1 = TuningGoal.Transient('phi_0','phi',G_required);
+Req2 = TuningGoal.Transient('phi_0','phi',G_required_2);
 
 [CL,fSoft,fHard] = systune(outerLoop,Req1, Req2);
 hold on
@@ -60,7 +62,6 @@ hold on
 pzmap(CL)
 
 figure(101)
-step(G_required)
+impulse(G_required)
 hold on
-step(G_required_2)
-step(CL(2))
+impulse(G_required_2)

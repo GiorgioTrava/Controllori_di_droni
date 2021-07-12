@@ -1,6 +1,6 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
-clc, clear
+clc, clear, close all
 
 %% Uncertain model state space representation
 
@@ -32,7 +32,7 @@ SYS = ss(A,B,C,D);
 SYS.StateName = {'v','p','phi'};
 SYS.InputName = 'delta_{lat}';
 SYS.OutputName = {'p','phi'};
-
+phi_0
 %% Transfer function
 
 % Transfer function of the nominal model
