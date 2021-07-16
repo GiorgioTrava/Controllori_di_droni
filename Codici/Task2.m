@@ -23,6 +23,12 @@ grid on, hold on
 bode(G)
 legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 
+%% Nyquist plot
+figure (3)
+nyquist(SYS)
+grid on, hold on
+nyquist(G)
+legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 % %% Frequency response function
 % 
 % SYSresponse = ufrd(SYS,logspace(-2,2,100))  
