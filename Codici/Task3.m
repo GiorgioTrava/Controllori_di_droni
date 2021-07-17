@@ -1,4 +1,4 @@
-%% AEROSPACE CONTROL SYSTEMS %%
+%% MODELLO DA REGOLARE INCERTO E NOMINALE (CON M_DELTA FORM)%%
 
 clc, clear, close all
 
@@ -46,40 +46,3 @@ outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'})
 % figure (8)
 % bode(lft(Delta_outerLoop,M_outerLoop))
 
-
-%% requisiti NP: funzione di trasferimento tra phi e phi_0
-omega_n_2 = 10;
-epsilon_2 = 0.9;
-numeratore_2 = omega_n_2^2;
-denominatore_2 = [1, 2*omega_n_2*epsilon_2, omega_n_2^2];
-G_required_2 = tf(numeratore_2, denominatore_2)
-
-omega_n = 15;
-epsilon = 0.98;
-numeratore = omega_n^2;
-denominatore = [1, 2*omega_n*epsilon, omega_n^2];
-G_required = tf(numeratore, denominatore)
-
-figure(100) 
-bode(G_required)
-hold on
-bode(G_required_2, 'r')
-
-Req1 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
-Req2 = TuningGoal.Transient('phi_0','phi',G_required_2, 'step');
-
-[CL,fSoft,fHard] = systune(outerLoop,Req1, Req2);
-hold on
-bode(CL(2))
-hold on
-%viewGoal(Req,CL)
-figure()
-pzmap(outerLoop)
-hold on
-pzmap(CL)
-
-figure(101)
-step(G_required)
-hold on
-step(G_required_2)
-step(CL(2))

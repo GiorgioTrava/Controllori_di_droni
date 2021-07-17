@@ -1,4 +1,4 @@
-%% AEROSPACE CONTROL SYSTEMS %%
+%% ANALISI MODELLO QUADROTOR %%
 
 clc, clear, close all
 
@@ -6,8 +6,6 @@ run Task1
 
 %% Zeros and poles map of the uncertain model
 
-P = pole(SYSn);
-Z = tzero(SYSn);
 
 figure(1)
 pzmap(SYS)
@@ -16,7 +14,7 @@ pzmap(SYSn)
 legend('Uncertain poles and zeros', 'Nominal poles and zeros')
 
 %% Bode plots
-SYSarray=usample(SYS,100);
+%SYSarray=usample(SYS,100);
 
 figure (2)
 bode(SYS)

@@ -23,7 +23,6 @@ innerLoop= connect(R_p,SYS,Sum_p,'p_0',{'p','phi'},'delta_{lat}')
 
 outerLoop= connect(R_phi,innerLoop,Sum_phi,'phi_0',{'p','phi'})
 
-
 figure(6)
 pzmap(innerLoop)
 grid on, hold on
@@ -36,24 +35,43 @@ bode(innerLoop)
 grid on, hold on
 bode(outerLoop)
 legend('inner loop bode diagram', 'outer loop bode diagram')
+%% Nominal to be tuned complete system
+innerLoop_n= connect(R_p,SYSn,Sum_p,'p_0',{'p','phi'},'delta_{lat}')
+
+outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'})
+
+
 %% M_delta form to be tuned complete system
 [M_outerLoop,Delta_outerLoop] = lftdata(outerLoop)
 % figure (8)
 % bode(lft(Delta_outerLoop,M_outerLoop))
-%% Nominal to be tuned complete system
-outerLoop_n=lft(Delta_outerLoop,M_outerLoop).NominalValue
+
+%% Input phi_0 da verificare
+
+t_f=20;
+timestep=0.001;
+t=[0:timestep:t_f];
+doublet_phi_0=interp1([0,1-timestep,1,3-timestep,3,5-timestep,5,t_f],[0,0,10,10,-10,-10,0,0],t);%deg!!!!!
+figure(8)
+plot(t,doublet_phi_0,'-')
+
+%funzione di trasferimento phi_0 delta_lat
+
+figure(9)
+lsim(outerLoop_n,doublet_phi_0*pi/180,t)
+
 %% requisiti NP: funzione di trasferimento tra phi e phi_0
 omega_n_2 = 10;
 epsilon_2 = 0.9;
 numeratore_2 = omega_n_2^2;
 denominatore_2 = [1, 2*omega_n_2*epsilon_2, omega_n_2^2];
-G_required_2 = tf(numeratore_2, denominatore_2)
+G_required_2 = t_f(numeratore_2, denominatore_2)
 
 omega_n = 15;
 epsilon = 0.98;
 numeratore = omega_n^2;
 denominatore = [1, 2*omega_n*epsilon, omega_n^2];
-G_required = tf(numeratore, denominatore)
+G_required = t_f(numeratore, denominatore)
 
 figure(100) 
 bode(G_required)

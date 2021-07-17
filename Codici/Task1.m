@@ -1,4 +1,4 @@
-%% AEROSPACE CONTROL SYSTEMS %%
+%% MODELLO QUADROTOR INCERTO E NOMINALE %%
 
 clc, clear, close all
 
