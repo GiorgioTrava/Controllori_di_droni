@@ -23,6 +23,7 @@ innerLoop= connect(R_p,SYS,Sum_p,'p_0',{'p','phi'},'delta_{lat}')
 
 outerLoop= connect(R_phi,innerLoop,Sum_phi,'phi_0',{'p','phi'})
 
+
 figure(6)
 pzmap(innerLoop)
 grid on, hold on
@@ -35,18 +36,12 @@ bode(innerLoop)
 grid on, hold on
 bode(outerLoop)
 legend('inner loop bode diagram', 'outer loop bode diagram')
-%% Nominal to be tuned complete system
-innerLoop_n= connect(R_p,SYSn,Sum_p,'p_0',{'p','phi'},'delta_{lat}')
-
-outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'})
-
-
 %% M_delta form to be tuned complete system
 [M_outerLoop,Delta_outerLoop] = lftdata(outerLoop)
 % figure (8)
 % bode(lft(Delta_outerLoop,M_outerLoop))
-
-
+%% Nominal to be tuned complete system
+outerLoop_n=lft(Delta_outerLoop,M_outerLoop).NominalValue
 %% requisiti NP: funzione di trasferimento tra phi e phi_0
 omega_n_2 = 10;
 epsilon_2 = 0.9;

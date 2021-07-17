@@ -44,10 +44,10 @@ axis([0 10 -1000 1000]);
 
 
 %% M_delta form of the plant
-[M,Delta] = lftdata(SYS)
+[M_SYS,Delta_SYS] = lftdata(SYS)
 
 figure (5)
-bode(lft(Delta,M))
+bode(lft(Delta_SYS,M_SYS))
 %norm(usample(SYS-lft(Delta,M),10),'inf')
 % %% Frequency response function
 % 
