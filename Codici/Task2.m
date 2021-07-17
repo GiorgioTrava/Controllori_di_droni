@@ -1,8 +1,8 @@
-%% ANALISI MODELLO QUADROTOR %%
+%% ANALISI MODELLO QUADROTOR (CON M_DELTA FORM) %%
 
-clc, clear, close all
+% clc, clear, close all
 
-run Task1
+% run Task1
 
 %% Zeros and poles map of the uncertain model
 
@@ -42,7 +42,7 @@ axis([0 10 -1000 1000]);
 
 
 %% M_delta form of the plant
-[M_SYS,Delta_SYS] = lftdata(SYS)
+[M_SYS,Delta_SYS] = lftdata(SYS);
 
 figure (5)
 bode(lft(Delta_SYS,M_SYS))
@@ -57,4 +57,4 @@ bode(lft(Delta_SYS,M_SYS))
 % bode(G)
 % legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 
-poliezeri = zpk(SYS)
+poliezeri = zpk(SYS);

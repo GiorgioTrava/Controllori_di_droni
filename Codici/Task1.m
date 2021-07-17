@@ -1,6 +1,6 @@
 %% MODELLO QUADROTOR INCERTO E NOMINALE %%
 
-clc, clear, close all
+% clc, clear, close all
 
 %% Uncertain model state space representation
 
