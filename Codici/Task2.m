@@ -27,7 +27,7 @@ figure (3)
 nyquist(SYS)
 grid on, hold on
 nyquist(SYSn)
-legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+legend('Uncertain model Nyquist diagram', 'Nominalmodel Nyquist diagram')
 
 %% step response
 figure (4)

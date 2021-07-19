@@ -22,6 +22,7 @@ G_required = tf(numeratore, denominatore);
 
 Req1 = TuningGoal.Transient('phi_0','phi',G_required);
 Req2 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
+%TuningGoal.Margins
 figure(20)
 viewGoal(Req1)
 hold on
