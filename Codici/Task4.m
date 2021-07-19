@@ -1,9 +1,9 @@
 %% SCELTA GUADAGNI E VERIFICA %%
-clc, clear, close all
-
-run Task1
-run Task2
-run Task3
+% clc, clear, close all
+% 
+% run Task1
+% run Task2
+% run Task3
 
 %% requisiti NP: funzione di trasferimento tra phi e phi_0
 omega_n_2 = 10;
@@ -23,6 +23,7 @@ G_required = tf(numeratore, denominatore);
 Req1 = TuningGoal.Transient('phi_0','phi',G_required);
 Req2 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
 %TuningGoal.Margins
+%structured H_inf-->ucover-->sensitivity
 figure(20)
 viewGoal(Req1)
 hold on
@@ -74,6 +75,9 @@ plot([t(1) t(end)],[5 5],'-r')
 plot([t(1) t(end)],[-5 -5],'-r')
 %funzione di trasferimento phi_0 delta_lat
 H1 = getIOTransfer(outerLoop_n_C,'phi_0','delta_{lat}');
-
+H2 = outerLoop_n_C(2);
 y=lsim(H1,doublet_phi_0*pi/180,t);
+y_phi=lsim(H2,doublet_phi_0*pi/180,t);
 plot(t,y*180/pi)
+plot(t,y_phi*180/pi,'--g')
+
