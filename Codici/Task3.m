@@ -19,26 +19,32 @@ Sum_p = sumblk('p_error = p_0 - p');
 Sum_phi = sumblk('phi_error = phi_0 - phi');
 
 
-innerLoop= connect(R_p,SYS,Sum_p,'p_0',{'p','phi'},'delta_{lat}');
+% innerLoop= connect(R_p,SYS,Sum_p,'p_0',{'p','phi'}),'delta_{lat}';
+% 
+% outerLoop= connect(R_phi,innerLoop,Sum_phi,'phi_0',{'p','phi'},);
 
-outerLoop= connect(R_phi,innerLoop,Sum_phi,'phi_0',{'p','phi'});
+outerLoop= connect(R_p,R_phi,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
 
-figure(6)
-pzmap(innerLoop)
-grid on, hold on
-pzmap(outerLoop)
-legend('inner loop poles and zeros', 'outer loop poles and zeros')
+% figure(6)
+% %pzmap(innerLoop)
+% grid on, 
+% pzmap(outerLoop)
+% %legend('inner loop poles and zeros', 'outer loop poles and zeros')
+% legend('outer loop poles and zeros')
 
 
-figure (7)
-bode(innerLoop)
-grid on, hold on
-bode(outerLoop)
-legend('inner loop bode diagram', 'outer loop bode diagram')
+% figure (7)
+% %bode(innerLoop)
+% grid on, 
+% bode(outerLoop)
+% %legend('inner loop bode diagram', 'outer loop bode diagram')
+% legend('outer loop bode diagram')
 %% Nominal to be tuned complete system
-innerLoop_n= connect(R_p,SYSn,Sum_p,'p_0',{'p','phi'},'delta_{lat}');
+% innerLoop_n= connect(R_p,SYSn,Sum_p,'p_0',{'p','phi'},'delta_{lat}');
+% 
+% outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'},'phi_error');
 
-outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'});
+outerLoop_n= connect(R_p,R_phi,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
 
 
 %% M_delta form to be tuned complete system

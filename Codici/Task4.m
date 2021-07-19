@@ -5,36 +5,58 @@
 % run Task2
 % run Task3
 
-%% requisiti NP: funzione di trasferimento tra phi e phi_0
+ %% requisiti NP: funzione di trasferimento tra phi e phi_0 
 omega_n_2 = 10;
 epsilon_2 = 0.9;
 numeratore_2 = omega_n_2^2;
 denominatore_2 = [1, 2*omega_n_2*epsilon_2, omega_n_2^2];
 G_required_2 = tf(numeratore_2, denominatore_2);
 
+
 omega_n = 15;
 epsilon = 0.98;
 numeratore = omega_n^2;
 denominatore = [1, 2*omega_n*epsilon, omega_n^2];
 G_required = tf(numeratore, denominatore);
+%% controllo
+tipo_controllo=['systune'] %possibilità: Hinf; systune;
 
+switch tipo_controllo
+    case 'systune'
+   
+    Req1 = TuningGoal.Transient('phi_0','phi',G_required);
+    Req2 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
+    %TuningGoal.Margins
+    %structured H_inf-->ucover-->sensitivity
+    figure(20)
+    viewGoal(Req1)
+    hold on
+    impulse(G_required_2,'--r')
+    figure(21)
+    viewGoal(Req2)
+    hold on
+    step(G_required_2,'--r')
 
-
-Req1 = TuningGoal.Transient('phi_0','phi',G_required);
-Req2 = TuningGoal.Transient('phi_0','phi',G_required, 'step');
-%TuningGoal.Margins
-%structured H_inf-->ucover-->sensitivity
-figure(20)
-viewGoal(Req1)
-hold on
-impulse(G_required_2,'--r')
-figure(21)
-viewGoal(Req2)
-hold on
-step(G_required_2,'--r')
-
-[outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
-
+    [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
+    case 'Hinf' 
+%     S_phi = getIOTransfer(outerLoop,'phi_0','phi_error');
+    WP=tf([1, 2*omega_n_2*epsilon_2, omega_n_2^2],[1, 2*omega_n_2*epsilon_2, 0 ])
+    WP.InputName = {'phi_error'}; 
+    WP.OutputName = {'phi_model'};
+    
+    R_H_inf=connect(R_p,R_phi,Sum_p,{'phi_error','p'},'delta_{lat}');
+   
+    P_H_inf=connect(SYSn,Sum_phi,WP,{'phi_0','delta_{lat}'},{'phi_error','p','phi_model'},'phi');
+    %P_H_inf=connect(G_required_2,Sum_e,outerLoop_n,'phi_0',);
+    opt = hinfstructOptions('Display','final','RandomStart',1);
+    [R_H_C]=hinfstruct(P_H_inf,R_H_inf,opt);
+    pid(R_H_C.Blocks.R_p)
+    pid(R_H_C.Blocks.R_phi)
+    outerLoop_n_C = connect(R_H_C,SYSn,Sum_phi,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
+%getIOTransfer(lft(P_H_inf,R_H_C),'phi_0',{'phi'});
+    
+    
+end
 pid(outerLoop_n_C.Blocks.R_p)
 pid(outerLoop_n_C.Blocks.R_phi)
 %% plot
