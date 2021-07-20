@@ -51,6 +51,9 @@ L_required_3 = F_required_3/(1-F_required_3);
 figure(3)
 bode(L_required)
 grid on, hold on
-bode(L_required_2)
-bode(L_required_3)
+%bode(L_required_2)
+%bode(L_required_3)
 legend
+s = tf('s');
+LS = (1+0.001*s/omega_n)/(0.001+s/omega_n);
+bode(LS)
