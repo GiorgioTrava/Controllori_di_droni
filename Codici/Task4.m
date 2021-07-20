@@ -55,7 +55,14 @@ switch tipo_controllo
     outerLoop_n_C = connect(R_H_C,SYSn,Sum_phi,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
 %getIOTransfer(lft(P_H_inf,R_H_C),'phi_0',{'phi'});
     
-    
+%     %%nota come recuperare la TF da "Fixed-Structure H-infinity Synthesis
+%     %%with hinfstruct"
+%     T = hinfstruct(T0,opt);
+%     showTunable(T)
+%     C = getBlockValue(T,'C');
+%     F = getValue(F0,T.Blocks);  % propagate tuned parameters from T to F
+
+tf(F)
 end
 pid(outerLoop_n_C.Blocks.R_p)
 pid(outerLoop_n_C.Blocks.R_phi)
