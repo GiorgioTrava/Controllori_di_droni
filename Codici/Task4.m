@@ -6,44 +6,62 @@
 % run Task3
 
  %% requisiti NP: funzione di trasferimento tra phi e phi_0 
-omega_n_2 = 10;
-epsilon_2 = 0.9;
-numeratore_2 = omega_n_2^2;
-denominatore_2 = [1, 2*omega_n_2*epsilon_2, omega_n_2^2];
-F_required_2 = tf(numeratore_2, denominatore_2);
-
-
-omega_n = 41;
-epsilon = 0.98;
+omega_n = 10;
+epsilon = 0.9;
 numeratore = omega_n^2;
 denominatore = [1, 2*omega_n*epsilon, omega_n^2];
 F_required = tf(numeratore, denominatore);
-%% controllo
+ 
+ 
+ 
+ 
+omega_n_sys = 16;
+epsilon_sys = 0.98;
+numeratore_sys = omega_n_sys^2;
+denominatore_sys = [1, 2*omega_n_sys*epsilon_sys, omega_n_sys^2];
+F_required_sys = tf(numeratore_sys, denominatore_sys);
+
+omega_n_H = 41;
+epsilon_H = 0.98;
+numeratore_H = omega_n_H^2;
+denominatore_H = [1, 2*omega_n_H*epsilon_H, omega_n_H^2];
+F_required_H = tf(numeratore_H, denominatore_H);
+ 
+
+%% controllo------------------------------------------------------
 tipo_controllo=['Hinf'] %possibilità: Hinf; systune;
 
 switch tipo_controllo
     case 'systune'
    
-    Req1 = TuningGoal.Transient('phi_0','phi',F_required);
-    Req2 = TuningGoal.Transient('phi_0','phi',F_required, 'step');
+    Req1 = TuningGoal.Transient('phi_0','phi',F_required_sys);
+    Req2 = TuningGoal.Transient('phi_0','phi',F_required_sys, 'step');
     %TuningGoal.Margins
     %structured H_inf-->ucover-->sensitivity
     figure(20)
     viewGoal(Req1)
     hold on
-    impulse(F_required_2,'--r')
+    
     figure(21)
     viewGoal(Req2)
     hold on
-    step(F_required_2,'--r')
+    
 
     [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
+    
+    R_p_C=pid(outerLoop_n_C.Blocks.R_p)
+    R_p_C.InputName = {'p_error'};       
+    R_p_C.OutputName = {'delta_{lat}'};
+
+    R_phi_C=pid(outerLoop_n_C.Blocks.R_phi)
+    R_phi_C.InputName = {'phi_error'};       
+    R_phi_C.OutputName = {'p_0'};
     case 'Hinf' 
 %     S_phi = getIOTransfer(outerLoop,'phi_0','phi_error');
 %% %tf([1, 2*omega_n_2*epsilon_2, 0 ],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%
 s = tf('s');
 
-    L_req=(1+0.001*s/omega_n)/(0.001+s/omega_n);%tf([1, 2*omega_n_2*epsilon_2, 0],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%tf([omega_n_2^2 ],[1, 2*omega_n_2*epsilon_2, 0]);% %
+    L_req=(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);%tf([1, 2*omega_n_2*epsilon_2, 0],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%tf([omega_n_2^2 ],[1, 2*omega_n_2*epsilon_2, 0]);% %
     L_req.InputName = {'phi_error'}; 
     L_req.OutputName = {'phi_E_req'};
     
@@ -79,8 +97,16 @@ s = tf('s');
 %     showTunable(T)
 %     C = getBlockValue(T,'C');
 %     F = getValue(F0,T.Blocks);  % propagate tuned parameters from T to F
-
-
+    figure(20)
+    impulse(F_required_H,'--r')
+    hold on
+    impulse(L_req/(1+L_req),'--k')
+    
+    figure(21)
+    step(F_required_H,'--r')
+    hold on
+    step(L_req/(1+L_req),'--k')
+    
 end
 % pid(outerLoop_n_C.Blocks.R_p)
 % pid(outerLoop_n_C.Blocks.R_phi)
@@ -102,14 +128,14 @@ figure(24)
 pzmap(outerLoop_n_C)
 legend
 figure(20)
-impulse(F_required_2,'g')
+impulse(F_required,'g')
 hold on
 impulse(outerLoop_n_C(2))
 legend
 figure(21)
 hold on
 step(outerLoop_n_C(2))
-step(F_required_2,'g')
+step(F_required,'g')
 legend
 
 

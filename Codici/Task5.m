@@ -1,22 +1,22 @@
 %% VERIFICA RS %%
-clc, clear, close all
-
-run Task1
-% run Task2
-run Task3
-run Task4
+% clc, clear, close all
+% 
+% run Task1
+% % run Task2
+% run Task3
+% run Task4
 
 %% creo modello incerto controllato
 
 %% Pid controller after tuning
 
-R_p_C = getBlockValue(outerLoop_n_C,'R_p')
-R_p_C.InputName = {'p_error'};       
-R_p_C.OutputName = {'delta_{lat}'};
-
-R_phi_C = getBlockValue(outerLoop_n_C,'R_phi')
-R_phi_C.InputName = {'phi_error'};       
-R_phi_C.OutputName = {'p_0'};
+% R_p_C = getBlockValue(outerLoop_n_C,'R_p')
+% R_p_C.InputName = {'p_error'};       
+% R_p_C.OutputName = {'delta_{lat}'};
+% 
+% R_phi_C = getBlockValue(outerLoop_n_C,'R_phi')
+% R_phi_C.InputName = {'phi_error'};       
+% R_phi_C.OutputName = {'p_0'};
 %% Uncertain to be tuned complete system
 
 % innerLoop_C= connect(R_p_C,SYS,Sum_p,'p_0',{'p','phi'},'delta_{lat}');
@@ -43,7 +43,7 @@ hold on
 
 
 
-% figure(502)
-% %relative errors
-% error_phi=(outerLoop_n_C(2)-outerLoop_C_phi_array);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
-% bodemag(error_phi,Info_phi.W1)
+figure(502)
+%relative errors
+error_phi=(outerLoop_n_C(2)-outerLoop_C_phi_array);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
+bodemag(error_phi,Info_phi.W1)

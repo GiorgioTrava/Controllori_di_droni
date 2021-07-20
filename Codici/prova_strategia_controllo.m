@@ -7,7 +7,7 @@ run Task1
 run Task3
 
 %%
-omega_n = 10;
+omega_n = 41;
 epsilon = 0.9;
 numeratore = omega_n^2;
 denominatore = [1, 2*omega_n*epsilon, omega_n^2];
@@ -43,6 +43,8 @@ bode(S_required)
 grid on, hold on
 bode(S_required_2)
 bode(S_required_3)
+prova=tf([1, 2*omega_n*epsilon, 0 ],[1, 2*omega_n*epsilon, omega_n^2]);
+bode(prova)
 legend
 
 L_required = F_required/(1-F_required);
@@ -57,3 +59,4 @@ legend
 s = tf('s');
 LS = (1+0.001*s/omega_n)/(0.001+s/omega_n);
 bode(LS)
+
