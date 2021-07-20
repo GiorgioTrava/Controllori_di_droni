@@ -59,4 +59,6 @@ legend
 s = tf('s');
 LS = (1+0.001*s/omega_n)/(0.001+s/omega_n);
 bode(LS)
-
+WH = makeweight(1000,omega_n,0.0001);
+bode(WH)
+tf(WH)
