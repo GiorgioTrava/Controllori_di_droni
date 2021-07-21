@@ -21,6 +21,8 @@ F_phi=outerLoop_C(2);
 % bode(F_phi)
 F_phi_n=getNominal(F_phi);
 S_phi=1-F_phi;
+F_p_n=getNominal(F_p);
+S_p=1-F_p;
 %% RS
 % [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop);
 % outerLoop_C=lft(Delta_outerLoop_C,M_outerLoop_C)
@@ -28,6 +30,9 @@ S_phi=1-F_phi;
 
 F_phi_array=usample(F_phi,60);
 [U_F_phi,Info_phi]=ucover(F_phi_array,F_phi_n,3);
+
+F_p_array=usample(F_p,60);
+[U_F_p,Info_p]=ucover(F_p_array,F_p_n,3);
    % NOTA:  USYS = ucover(PARRAY,PNOM,ORD) uses the simplified uncertainty model 
         %   USYS = PNOM*(I + W*ULTIDYN)
         %   where W is a scalar-valued filter of order ORD. This corresponds to 
@@ -37,25 +42,39 @@ F_phi_array=usample(F_phi,60);
         %   optimal filter values over a frequency grid. To reuse this information
         %   and quickly try different orders for W1 and W2, use the syntax:
         %      [USYSnew,INFOnew] = ucover(PNOM,INFO,ORD1new,ORD2new)
-W=Info_phi.W1;
+W_phi=Info_phi.W1;
+W_p=Info_p.W1;
 
-figure(502)
+figure(500)
+subplot(2,1,1)
 %errors
-error_phi=abs(F_phi_n-F_phi_array)/abs(F_phi_n);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
-bodemag(error_phi,W)
+error_phi=(tf(F_phi_n)-tf(F_phi_array))/tf(F_phi_n);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
+bodemag(error_phi,W_phi)
+legend
+subplot(2,1,2)
+error_p=(tf(F_p_n)-tf(F_p_array))/tf(F_p_n);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
+bodemag(error_p,W_p)
 legend
 
 %ROBUST STABILITY F_nominal<=1/W
 figure(501)
-bodemag(F_phi_n,1/W)
-legend('F_{nomninal}','1/W')
+subplot(2,1,1)
+bodemag(F_phi_n,1/W_phi)
+legend('F_phi_n','1/W_phi')
+grid on
+subplot(2,1,2)
+bodemag(F_p_n,1/W_p)
+legend('F_p_n','1/W_p')
 grid on
 
 %ROBUST STABILITY max singular value(M)=H_inf_norm(M)<1
 
-[M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop_C);
 
-[sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
-sigma(M_outerLoop_C)
+
+% [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop_C);
+% 
+% [sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
+% figure(502)
+% sigma(tf(M_outerLoop_C))
 
 
