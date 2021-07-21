@@ -1,6 +1,6 @@
 %% VERIFICA RS %%
 % clc, clear, close all
-  close all
+%  close all
 % run Task1
 % % run Task2
 % run Task3
@@ -17,8 +17,6 @@ nyquist(outerLoop_C)
 
 F_p=outerLoop_C(1);%getIOTransfer(outerLoop_C,'phi_0','phi');%outerLoop_C(1)
 F_phi=outerLoop_C(2);
-% figure(322)
-% bode(F_phi)
 F_phi_n=getNominal(F_phi);
 S_phi=1-F_phi;
 %% RS
@@ -27,7 +25,7 @@ S_phi=1-F_phi;
 
 
 F_phi_array=usample(F_phi,60);
-[U_F_phi,Info_phi]=ucover(F_phi_array,F_phi_n,3);
+[U_F_phi,Info_phi]=ucover(F_phi_array,F_phi_n,1);
    % NOTA:  USYS = ucover(PARRAY,PNOM,ORD) uses the simplified uncertainty model 
         %   USYS = PNOM*(I + W*ULTIDYN)
         %   where W is a scalar-valued filter of order ORD. This corresponds to 
@@ -40,8 +38,8 @@ F_phi_array=usample(F_phi,60);
 W=Info_phi.W1;
 
 figure(502)
-%errors
-error_phi=abs(F_phi_n-F_phi_array)/abs(F_phi_n);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
+%relative errors
+error_phi=(F_phi_n-F_phi_array);%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
 bodemag(error_phi,W)
 legend
 

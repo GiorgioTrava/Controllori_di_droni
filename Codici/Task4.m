@@ -29,7 +29,7 @@ F_required_H = tf(numeratore_H, denominatore_H);
  
 
 %% controllo------------------------------------------------------
-tipo_controllo=['Hinf'] %possibilità: Hinf; systune;
+tipo_controllo=['systune'] %possibilità: Hinf; systune;
 
 switch tipo_controllo
     case 'systune'
@@ -38,16 +38,16 @@ switch tipo_controllo
     Req2 = TuningGoal.Transient('phi_0','phi',F_required_sys, 'step');
     %TuningGoal.Margins
     %structured H_inf-->ucover-->sensitivity
-    figure(20)
-    viewGoal(Req1)
+  
+
+    [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
+      figure(20)
+    viewGoal(Req1,outerLoop_n_C)
     hold on
     
     figure(21)
-    viewGoal(Req2)
+    viewGoal(Req2,outerLoop_n_C)
     hold on
-    
-
-    [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
     
     R_p_C=pid(outerLoop_n_C.Blocks.R_p)
     R_p_C.InputName = {'p_error'};       
@@ -57,11 +57,11 @@ switch tipo_controllo
     R_phi_C.InputName = {'phi_error'};       
     R_phi_C.OutputName = {'p_0'};
     case 'Hinf' 
-%     S_phi = getIOTransfer(outerLoop,'phi_0','phi_error');
-%% %tf([1, 2*omega_n_2*epsilon_2, 0 ],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%
+%S_phi = getIOTransfer(outerLoop,'phi_0','phi_error');
+%%tf([1, 2*omega_n_2*epsilon_2, 0 ],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%
 s = tf('s');
 
-    L_req=makeweight(1000,omega_n_H,0.00001);%(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);
+    L_req=makeweight(1000,omega_n_H,0.1);%(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);
     L_req.InputName = {'phi_error'}; 
     L_req.OutputName = {'phi_E_req'};
     
@@ -81,11 +81,35 @@ s = tf('s');
     rng('default')
     opt = hinfstructOptions('Display','final','RandomStart',5);
     [SisTot_C,gamma,info]=hinfstruct(SisTot,opt);
-    R_p_C=pid(SisTot_C.Blocks.R_p)
+       %% prova struttura differente
+       s=zpk('s')
+W1_inv=(s+1e-3*(omega_n_H-20))/(s/1.47+(omega_n_H-20));
+    W1=(s/1.35+12)/(s+1e-3*12);%makeweight(1000,30,0.1);%1/W1_inv;%
+    W1.InputName = {'p_error'};       
+    W1.OutputName = {'z1'};
+   
+    W2=1/tf(200,1);
+    W2.InputName = {'delta_{lat}'};       
+    W2.OutputName = {'z2'};
+%     W3=;%makeweight(0.1,30,1000);
+%     W3.InputName = {'phi'};       
+%     W3.OutputName = {'z3'};
+figure(1000)
+bode(W1)
+hold on
+
+    P=connect(SYSn,Sum_phi,Sum_p,W1,W2,{'phi_0','p_0','delta_{lat}'},...
+        {'z1','z2','phi_error','p_error'});
+    [K_C,gamma,info]=hinfstruct(P,R_H_inf,opt);
+    
+    %% ricostruzione sistema
+     R_p_C=pid(SisTot_C.Blocks.R_p) %!!!!!!!!!!!!!!!!!!!!!!!!
+%      R_p_C=pid(K_C.Blocks.R_p)
     R_p_C.InputName = {'p_error'};       
     R_p_C.OutputName = {'delta_{lat}'};
 
-    R_phi_C=pid(SisTot_C.Blocks.R_phi)
+    R_phi_C=pid(SisTot_C.Blocks.R_phi) %!!!!!!!!!!!!!!!!!!!!!!
+%     R_phi_C=pid(K_C.Blocks.R_phi)
     R_phi_C.InputName = {'phi_error'};       
     R_phi_C.OutputName = {'p_0'};
     outerLoop_n_C= connect(R_p_C,R_phi_C,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
@@ -106,7 +130,7 @@ s = tf('s');
     step(F_required_H,'--r')
     hold on
     step(L_req/(1+L_req),'--k')
-    
+
 end
 % pid(outerLoop_n_C.Blocks.R_p)
 % pid(outerLoop_n_C.Blocks.R_phi)

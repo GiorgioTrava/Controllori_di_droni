@@ -56,7 +56,7 @@ bode(lft(Delta_SYS,M_SYS))
 % grid on, hold on
 % bode(G)
 % legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
-%% Ucover della plant
+
 
 
 poliezeri = zpk(SYS);
