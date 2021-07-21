@@ -40,6 +40,7 @@ SYS.OutputName = {'p','phi'};
 
 % Transfer function of the nominal model
 SYSn=SYS.NominalValue;
+
 % G = tf(SYS);
 % G.InputName = 'DELTA_{lat}';
 % G.OutputName = {'P','PHI'};

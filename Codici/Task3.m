@@ -48,6 +48,6 @@ outerLoop_n= connect(R_p,R_phi,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_erro
 
 
 %% M_delta form to be tuned complete system
-%[M_outerLoop,Delta_outerLoop] = lftdata(outerLoop);
+[M_outerLoop,Delta_outerLoop] = lftdata(outerLoop);
 % figure (8)
 % bode(lft(Delta_outerLoop,M_outerLoop))
