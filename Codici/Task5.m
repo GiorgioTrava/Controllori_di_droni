@@ -104,6 +104,13 @@ M_no_input_output= M_tf_outerLoop_C(1:4,1:4) %M_delta form di MATLAB senza consi
 figure(502)
 sigma(M_outerLoop_C,M_no_input_output) %confronto
 hold on
+
+%prova mu
+omega=logspace(-3,2,500);
+bounds_mu=mussv(frd(M_no_input_output,omega),[2 0; 2 0]);
+
+figure(502)
+sigma(bounds_mu), grid
 %% M_delta form tentativo 1
 
 Sum_phi_n= sumblk('phi = w1 + phi_nom');
@@ -145,12 +152,12 @@ hold on
 sigma_max = getPeakGain(M_outerLoop_C) %dovrebbe essere mu per sistemi stabili
 sigma_max_no_input_output = getPeakGain(M_no_input_output)
 
-% omega=logspace(-3,2,500);
-% bounds=mussv(frd(M_outerLoop_C,omega),[1 0;1 0 ]);
-% 
-% figure(503)
-% sigma(bounds), grid
+%prova mu
+omega=logspace(-3,2,500);
+bounds_mu=mussv(frd(M_no_input_output,omega),[1 0; 1 0]);
 
+figure(502)
+sigma(bounds_mu), grid
 
 % figure(667)
 % bode(tf(M_outerLoop_C))
@@ -161,14 +168,14 @@ F_w_yn= minreal(1/(eye(2,2)-tf(SYSn)*R_C)*tf(SYSn)*R_C);
 F_w_yn.InputName={'w1','w2'};
 M_outerLoop_C=minreal(W_i*F_w_yn);
 figure(502)
-sigma(tf(M_outerLoop_C))
+sigma(tf(M_outerLoop_C)) %in qualche modo equivale al mu -->penso che sia perchè con le matrici assumo delta diagonale
 hold on
 %prova mu
 omega=logspace(-3,2,500);
-bounds=mussv(frd(M_outerLoop_C,omega),[1 0; 1 0]);
+bounds_mu=mussv(frd(M_outerLoop_C,omega),[1 0; 1 0]);
 
 figure(503)
-sigma(bounds), grid
+sigma(bounds_mu), grid
 %% Robust stability mu_analysys
 
 [gamma,~] = musynperf(M_outerLoop_C)
