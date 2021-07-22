@@ -1,6 +1,7 @@
 %% SCELTA GUADAGNI E VERIFICA %%
+
 % clc, clear, close all
-% 
+ 
 % run Task1
 % run Task2
 % run Task3
