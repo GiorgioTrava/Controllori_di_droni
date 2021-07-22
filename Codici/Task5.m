@@ -78,20 +78,31 @@ grid on
 %% ROBUST STABILITY max singular value(F)<1/W
 
 W_i=[W_phi 0; 0 W_p];
+figure(507)
+sigma(tf(outerLoop_C),1/W_i) %nota:è la stessa cosa che fare le due funzioni una per una
+hold on
 figure(502)
-sigma(tf(outerLoop_C),1/W_i) %nota:non sono per niente sicuro
-% figure(506)
-% sigma(tf(outerLoop_C)*W_i) %dovrebbe essere l'equivalente dell'M-delta form<1
+sigma(W_i*tf(outerLoop_C))%dovrebbe essere l'equivalente dell'M-delta form<1
+hold on
+[sigma_max_no_input_output,freq_peak_no_input_output]=hinfnorm(W_i*tf(outerLoop_C))
 
 %% ROBUST STABILITY max singular value(M)=H_inf_norm(M)<1
 
 
 %% M_delta form MATLAB  NOTA: commentare le altre versioni di M_delta per vederne una
+%%questa versione è corretta ma mette nelle incertezze i singoli parametri
+%%di A-->delta è 4x4
 [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop_C);
+M_outerLoop_C.InputName={'w1','w2','w3','w4','phi_0'}
+M_outerLoop_C.OutputName={'z1','z2','z3','z4','p','phi'}
 
-[sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
+M_tf_outerLoop_C=tf(M_outerLoop_C) 
+M_no_input_output= M_tf_outerLoop_C(1:4,1:4) %M_delta form di MATLAB senza considerare input e output del sistema
+[sigma_max_no_input_output_M,freq_peak_no_input_output_M]=hinfnorm(M_no_input_output)
+[sigma_max_M,freq_peak_M]=hinfnorm(M_outerLoop_C)
+
 figure(502)
-sigma(tf(M_outerLoop_C))
+sigma(M_outerLoop_C,M_no_input_output) %confronto
 hold on
 %% M_delta form tentativo 1
 
@@ -119,10 +130,20 @@ outerLoop_C_verifica=connect(Delta_outerLoop_C,M_outerLoop_C,'phi_0',{'p','phi'}
 figure(320)
 hold on
 bode(outerLoop_C_verifica)
-getPeakGain(M_outerLoop_C)
-[sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
+
+
+% [sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
+
+
+M_tf_outerLoop_C=tf(M_outerLoop_C) ;
+M_no_input_output= M_tf_outerLoop_C(3:4,2:3); 
+% [sigma_max,freq_peak]=hinfnorm(M_no_input_output)
 figure(502)
-sigma(tf(M_outerLoop_C))
+sigma(M_outerLoop_C,M_no_input_output)
+hold on
+
+sigma_max = getPeakGain(M_outerLoop_C) %dovrebbe essere mu per sistemi stabili
+sigma_max_no_input_output = getPeakGain(M_no_input_output)
 
 % omega=logspace(-3,2,500);
 % bounds=mussv(frd(M_outerLoop_C,omega),[1 0;1 0 ]);
@@ -136,9 +157,13 @@ sigma(tf(M_outerLoop_C))
 %% M_delta form tentativo 2 (sistema con output vettoriali)
 R_C=tf(connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi','p'},'delta_{lat}')); %NOTA:perchè funzioni devo togliere phi_0 dagli input?????
 W_i=[tf(W_phi) 0; 0 tf(W_p)];
-M_outerLoop_C=minreal(W_i*inv(eye(2,2)+tf(SYSn)*R_C)*tf(SYSn)*R_C);
+F_w_yn= minreal(1/(eye(2,2)-tf(SYSn)*R_C)*tf(SYSn)*R_C);
+F_w_yn.InputName={'w1','w2'};
+M_outerLoop_C=minreal(W_i*F_w_yn);
 figure(502)
 sigma(tf(M_outerLoop_C))
+hold on
+%prova mu
 omega=logspace(-3,2,500);
 bounds=mussv(frd(M_outerLoop_C,omega),[1 0; 1 0]);
 

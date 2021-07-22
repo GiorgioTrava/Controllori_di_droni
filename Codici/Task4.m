@@ -40,7 +40,7 @@ switch tipo_controllo
     %structured H_inf-->ucover-->sensitivity
   
 
-    [outerLoop_n_C,fSoft] = systune(outerLoop,[Req1, Req2]);
+    [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
       figure(20)
     viewGoal(Req1,outerLoop_n_C)
     hold on
