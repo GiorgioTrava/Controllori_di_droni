@@ -104,7 +104,7 @@ switch tipo_controllo
         R_phi_C.InputName = {'phi_error'};       
         R_phi_C.OutputName = {'p_0'};
     case 'Hinf_2'
-        %prova struttura differente
+        %% prova struttura differente
         s=zpk('s');
         W1_inv=(s+1e-3*(omega_n_H_2-20))/(s/1.47+(omega_n_H_2-20));
         W1=(s/1.35+12)/(s+1e-3*12);%makeweight(1000,30,0.1);%1/W1_inv;%
