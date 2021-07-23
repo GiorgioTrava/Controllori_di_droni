@@ -14,9 +14,9 @@ outerLoop_C = connect(R_phi_C,R_p_C,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_
 
 % Nyquist dell'open loop (con R condensato per output vettoriali)
 R_C=connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi_0','phi','p'},'delta_{lat}');
-OpenLoop_C=SYS*R_C;
+OpenLoop_C=minreal(SYSn*R_C);
 figure(321)
-nyquist(OpenLoop_C)
+nyquist(OpenLoop_C(2,1))
 ylim([-300 300])
 % Bode closed and open loop
 figure(320)
@@ -114,13 +114,13 @@ M_no_input_output = M_tf_outerLoop_C(1:4,1:4); %M_delta form di MATLAB senza con
 [sigma_max_M,freq_peak_M] = hinfnorm(M_outerLoop_C)
 
 figure(502)
-sigma(M_outerLoop_C) %confronto
+% sigma(M_outerLoop_C) %confronto
 hold on
 sigma(M_no_input_output)
 
 %prova mu
 omega=logspace(-3,2,500);
-bounds_mu=mussv(frd(M_no_input_output,omega),[4 0]);%si può usare BLKSTRUCT (output di lfdata )
+bounds_mu=mussv(frd(M_no_input_output,omega),[1 0;1 0;1 0;1 0]);%si può usare BLKSTRUCT (output di lfdata )
 
 figure(502)
 sigma(bounds_mu)
@@ -183,6 +183,13 @@ sigma_max_no_input_output = getPeakGain(M_no_input_output)
 % prova mu
 omega=logspace(-3,2,500);
 bounds_mu=mussv(frd(M_no_input_output,omega),[1 0;1 0]);
+
+
+% ropt = robOptions('Mussv','g','VaryFrequency','on');
+% [SM3,WC3,INFO3] = robstab(outerLoop_C,ropt)
+% figure
+% semilogx(INFO3.Frequency,1./INFO3.Bounds)
+% xlim([1e-3 1e3])
 
 figure(502)
 sigma(bounds_mu), grid
