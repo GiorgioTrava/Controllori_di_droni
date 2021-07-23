@@ -13,8 +13,10 @@
 outerLoop_C = connect(R_phi_C,R_p_C,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
 
 % Nyquist dell'open loop (con R condensato per output vettoriali)
-R_C=connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi_0','phi','p'},'delta_{lat}');
-OpenLoop_C=minreal(SYSn*R_C);
+
+%R_C=connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi_0','phi','p'},'delta_{lat}');
+L_interna=connect(SYS,R_p_C,'p_error',{'p','phi'});
+OpenLoop_C=minreal(-L_interna*R_phi_C)%minreal(SYSn*R_C);
 figure(321)
 nyquist(OpenLoop_C(2,1))
 ylim([-300 300])
@@ -26,6 +28,10 @@ xlim([1e-5 1e4])
 figure(320)
 bode(OpenLoop_C([1:2],1))
 legend('outerLoop_C','L')
+figure(322)
+margin(OpenLoop_C(2,1))
+figure(323)
+margin(OpenLoop_C(1,1))
 
 F_p = outerLoop_C(1);%getIOTransfer(outerLoop_C,'phi_0','phi');%outerLoop_C(1)
 F_phi = outerLoop_C(2);
@@ -87,16 +93,18 @@ bodemag(F_p_n,1/W_p)
 legend('F_p_n','1/W_p')
 grid on
 
-%% ROBUST STABILITY max singular value(F)<1/W
+%% ROBUST STABILITY max singular value(F)<1/W 
+%NOTA: il sistema è mimo
 
 W_i = [W_phi 0; 0 W_p];
 figure(507)
-sigma(tf(outerLoop_C),1/W_i) %nota:è la stessa cosa che fare le due funzioni una per una
+sigma(tf(outerLoop_n_C),1/W_i) %nota:è la stessa cosa che fare le due funzioni una per una
 hold on
 figure(502)
-% sigma(W_i*tf(outerLoop_C))%cazzata !
-% hold on
-% [sigma_max_no_input_output,freq_peak_no_input_output] = hinfnorm(W_i*tf(outerLoop_C))
+M_forse=minreal(-W_i*tf(outerLoop_n_C));
+sigma(M_forse)
+hold on
+[sigma_max_no_input_output,freq_peak_no_input_output] = hinfnorm(M_forse)
 
 %% ROBUST STABILITY max singular value(M)=H_inf_norm(M)<1
 
@@ -120,14 +128,18 @@ sigma(M_no_input_output)
 
 %prova mu
 omega=logspace(-3,2,500);
-bounds_mu=mussv(frd(M_no_input_output,omega),[1 0;1 0;1 0;1 0]);%si può usare BLKSTRUCT (output di lfdata )
+[bounds_mu,muinfo]=mussv(frd(M_no_input_output,omega),[1 0;1 0;1 0;1 0]);%si può usare BLKSTRUCT (output di lfdata )
+
+[VDelta,VSigma,VLmi] = mussvextract(muinfo);
+
+VDelta 
 
 figure(502)
-sigma(bounds_mu)
+sigma(bounds_mu(1))
 hold on
 grid
 %% M_delta form tentativo 1
-%STRUTTURA DA RIFARE!!!!
+
 % Sum_phi_n= sumblk('phi = w1 + phi_nom');
 % Sum_p_n= sumblk('p = w2 + p_nom');
 % SYSn.InputName = 'delta_{lat}'; 
@@ -142,7 +154,8 @@ G_p.InputName = 'delta_{lat}_{p}';
 G_phi.InputName = 'delta_{lat}_{phi}'; 
 M_outerLoop_C=connect(R_phi_C,R_p_C,G_p,G_phi,Sum_phi,Sum_p,Sum_delta_phi,Sum_delta_p,W_phi,W_p,...
     {'phi_0','w1','w2'},{'p','phi','z1','z2'});
-
+M_no_input_output=connect(R_phi_C,R_p_C,G_p,G_phi,Sum_phi,Sum_p,Sum_delta_phi,Sum_delta_p,W_phi,W_p,...
+    {'w1','w2'},{'z1','z2'});
 
 
 Delta_phi=ultidyn('Delta_phi',[1 1],'Bound',1);
@@ -151,10 +164,10 @@ Delta_phi.OutputName={'w1'};
 Delta_p=ultidyn('Delta_p',[1 1],'Bound',1);
 Delta_p.InputName={'z2'};
 Delta_p.OutputName={'w2'};
-Delta_outerLoop_C= connect(Delta_phi,Delta_p,{'z1','z2'},{'w1','w2'});
-% Delta_outerLoop_C=ultidyn('Delta_outerLoop_C',[2 2],'Bound',1);
-% Delta_outerLoop_C.InputName={'z1','z2'};
-% Delta_outerLoop_C.OutputName={'w1','w2'};
+% Delta_outerLoop_C= connect(Delta_phi,Delta_p,{'z1','z2'},{'w1','w2'});
+Delta_outerLoop_C=ultidyn('Delta_outerLoop_C',[2 2],'Bound',1);
+Delta_outerLoop_C.InputName={'z1','z2'};
+Delta_outerLoop_C.OutputName={'w1','w2'};
 
 outerLoop_C_verifica=connect(Delta_outerLoop_C,M_outerLoop_C,'phi_0',{'p','phi'});
 
@@ -169,8 +182,8 @@ bode(outerLoop_C_verifica)
 % [sigma_max,freq_peak]=hinfnorm(M_outerLoop_C)
 
 
-M_tf_outerLoop_C=tf(M_outerLoop_C) ;
-M_no_input_output= M_tf_outerLoop_C(3:4,2:3); 
+% M_tf_outerLoop_C=tf(M_outerLoop_C) ;
+% M_no_input_output= M_tf_outerLoop_C(3:4,2:3); 
 % [sigma_max,freq_peak]=hinfnorm(M_no_input_output)
 figure(502)
 % sigma(M_outerLoop_C)
@@ -186,13 +199,13 @@ bounds_mu=mussv(frd(M_no_input_output,omega),[1 0;1 0]);
 
 
 % ropt = robOptions('Mussv','g','VaryFrequency','on');
-% [SM3,WC3,INFO3] = robstab(outerLoop_C,ropt)
+% [SM3,WC3,INFO3] = robstab(outerLoop_C_verifica,ropt)
 % figure
 % semilogx(INFO3.Frequency,1./INFO3.Bounds)
 % xlim([1e-3 1e3])
 
 figure(502)
-sigma(bounds_mu), grid
+sigma(bounds_mu(1)), grid
 
 % figure(667)
 % bode(tf(M_outerLoop_C))

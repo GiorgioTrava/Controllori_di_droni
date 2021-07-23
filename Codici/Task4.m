@@ -115,8 +115,8 @@ switch tipo_controllo
         
         s=zpk('s');
         M_w1=hinfnorm(S_required)%db2mag(1.47)
-        A_w1=0.0001
-        W1_inv=(s+A_w1*omega_n)/(s/M_w1+omega_n)
+        A_w1=0.00001
+        W1_inv=(s+A_w1*omega_n)/(s/M_w1+omega_n) % sensitivity overbound 
         W1=1/W1_inv;
         W1.InputName = {'p_error'};       
         W1.OutputName = {'z1'};
