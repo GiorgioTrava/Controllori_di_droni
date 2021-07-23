@@ -14,7 +14,7 @@ denominatore = [1, 2*omega_n*epsilon, omega_n^2];
 F_required = tf(numeratore, denominatore);
  
 omega_n_systune = 16;
-epsilon_systune = 0.97;
+epsilon_systune = 0.9;
 numeratore_systune = omega_n_systune^2;
 denominatore_systune = [1, 2*omega_n_systune*epsilon_systune, omega_n_systune^2];
 F_required_systune = tf(numeratore_systune, denominatore_systune);
@@ -40,15 +40,21 @@ switch tipo_controllo
         Req1 = TuningGoal.Transient('phi_0','phi',F_required_systune);
         Req2 = TuningGoal.Transient('phi_0','phi',F_required_systune, 'step');
         %TuningGoal.Margins
+        %Req = TuningGoal.WeightedGain(inputname,outputname,WL,WR)
+        Req3 = TuningGoal.Tracking('phi_0','phi',2/omega_n_systune,0.0001,1.1);
+        Req4 = TuningGoal.Overshoot('phi_0','phi',2); 
+        Req5 = TuningGoal.Gain('phi_error','delta_{lat}',0.34);
+        %Req = TuningGoal.Sensitivity(location,maxsens)
         %structured H_inf-->ucover-->sensitivity
 
-        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1, Req2]);
-        
-        figure(20)
+        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req2,Req4,Req3],Req5);
+        %WF = getWeight(Req1,0)
+
+        figure(18)
         viewGoal(Req1,outerLoop_n_C)
         hold on
 
-        figure(21)
+        figure(19)
         viewGoal(Req2,outerLoop_n_C)
         hold on
 
@@ -65,7 +71,7 @@ switch tipo_controllo
         %%tf([1, 2*omega_n_2*epsilon_2, 0 ],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%
         s = tf('s');
 
-        L_req=makeweight(1000,omega_n_H_1,0.1);%(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);
+        L_req=makeweight(1000,omega_n_H_1,0.01);%(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);
         L_req.InputName = {'phi_error'}; 
         L_req.OutputName = {'phi_E_req'};
 
@@ -106,9 +112,12 @@ switch tipo_controllo
         R_phi_C.OutputName = {'p_0'};
     case 'Hinf_2'
         %prova struttura differente
+        
         s=zpk('s');
-        W1_inv=(s+1e-3*(omega_n_H_2-20))/(s/1.47+(omega_n_H_2-20));
-        W1=(s/1.35+12)/(s+1e-3*12);%makeweight(1000,30,0.1);%1/W1_inv;%
+        M_w1=hinfnorm(S_required)%db2mag(1.47)
+        A_w1=0.0001
+        W1_inv=(s+A_w1*omega_n)/(s/M_w1+omega_n)
+        W1=1/W1_inv;
         W1.InputName = {'p_error'};       
         W1.OutputName = {'z1'};
 
@@ -116,16 +125,19 @@ switch tipo_controllo
         W2.InputName = {'delta_{lat}'};       
         W2.OutputName = {'z2'};
         
-        %     W3=;%makeweight(0.1,30,1000);
-        %     W3.InputName = {'phi'};       
-        %     W3.OutputName = {'z3'};
+        W3=1/W1;%makeweight(0.1,30,1000);
+        W3.InputName = {'phi'};       
+        W3.OutputName = {'z3'};
         
         figure(1000)
         bode(W1)
         hold on
-
-        P=connect(SYSn,Sum_phi,Sum_p,W1,W2,{'phi_0','p_0','delta_{lat}'},... %ricordarsi di aggiungere W3 e z3 se necessari 
-        {'z1','z2','phi_error','p_error'});
+        
+        R_H_inf=connect(R_p,R_phi,{'phi_error','p_error'},{'delta_{lat}','p_0'});
+        P=connect(SYSn,Sum_phi,Sum_p,W1,W2,W3,{'phi_0','p_0','delta_{lat}'},... %ricordarsi di aggiungere W3 e z3 se necessari 
+        {'z1','z2','z3','phi_error','p_error'});
+        
+        opt = hinfstructOptions('Display','final','RandomStart',10);
         [K_C,gamma,info]=hinfstruct(P,R_H_inf,opt);
 
         %plot
@@ -148,6 +160,7 @@ switch tipo_controllo
         R_phi_C.OutputName = {'p_0'};
         
     case 'Open loop'
+        %controllo su p
         
         
 end
@@ -175,7 +188,6 @@ step(F_required,'g')
 hold on
 step(outerLoop_n_C(2))
 legend
-
 
 figure(22) 
 bode(F_required,'g')

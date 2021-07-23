@@ -7,12 +7,14 @@ run Task1
 run Task3
 
 %%
-omega_n = 41;
+s=tf('s');
+omega_n = 10;
 epsilon = 0.9;
-numeratore = omega_n^2;
-denominatore = [1, 2*omega_n*epsilon, omega_n^2];
-F_required = tf(numeratore, denominatore);
-
+% numeratore = omega_n^2;
+% denominatore = [1, 2*omega_n*epsilon, omega_n^2];
+F_required = omega_n^2/(s^2+2*epsilon*omega_n*s+omega_n^2);%tf(numeratore, denominatore)
+y=step(F_required)
+stepinfo(y)
 % omega_n_2 = 15;
 % epsilon_2 = 0.9;
 % numeratore_2 = omega_n_2^2;
@@ -27,6 +29,8 @@ F_required = tf(numeratore, denominatore);
 
 t_a=5/(epsilon*omega_n)
 perc_overshoot=exp(-pi*epsilon/sqrt(1-epsilon^2))*100
+
+
 
 figure(1)
 bode(F_required)
@@ -45,8 +49,10 @@ grid on, hold on
 % bode(S_required_3)
 %  prova=tf([1, 2*omega_n*epsilon, 0 ],[1, 2*omega_n*epsilon, omega_n^2]);
 %  bode(prova)
-s=zpk('s')
-W1_inv=(s+1e-3*(omega_n-20))/(s/1.47+(omega_n-20))
+s=zpk('s');
+M=hinfnorm(S_required)%db2mag(1.47)
+A=0.0001
+W1_inv=(s+A*omega_n)/(s/M+omega_n)%(s+1e-3*(omega_n-20))/(s/1.47+(omega_n-20))
 
 bode(W1_inv)
 legend
@@ -60,6 +66,9 @@ grid on, hold on
 %bode(L_required_2)
 %bode(L_required_3)
 legend
+
+figure
+margin(5/(s*(0.1*s+1)))
 % s = tf('s');
 % LS = (1+0.001*s/omega_n)/(0.001+s/omega_n);
 % bode(LS)

@@ -11,11 +11,21 @@
 %% creo modello incerto controllato
 
 outerLoop_C = connect(R_phi_C,R_p_C,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
+
+% Nyquist dell'open loop (con R condensato per output vettoriali)
+R_C=connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi_0','phi','p'},'delta_{lat}');
+OpenLoop_C=SYS*R_C;
+figure(321)
+nyquist(OpenLoop_C)
+ylim([-300 300])
+% Bode closed and open loop
 figure(320)
 bode(outerLoop_C)
-% figure(321)
-% nyquist(outerLoop_C)
-
+hold on
+xlim([1e-5 1e4])
+figure(320)
+bode(OpenLoop_C([1:2],1))
+legend('outerLoop_C','L')
 
 F_p = outerLoop_C(1);%getIOTransfer(outerLoop_C,'phi_0','phi');%outerLoop_C(1)
 F_phi = outerLoop_C(2);
@@ -23,13 +33,13 @@ F_phi = outerLoop_C(2);
 % bode(F_phi)
 F_phi_n = getNominal(F_phi);
 F_phi_n.InputName = {'delta_{lat}'};
-F_phi_n.OutputName = {'phi_nom'};
+F_phi_n.OutputName = {'phi'};
 S_phi = 1-F_phi;
 F_p_n = getNominal(F_p);
 F_p_n.InputName = {'delta_{lat}'};
-F_p_n.OutputName = {'p_nom'};
+F_p_n.OutputName = {'p'};
 S_p = 1-F_p;
-%% RS
+%% OVERBOUND DELL'ERRORE
 % [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop);
 % outerLoop_C=lft(Delta_outerLoop_C,M_outerLoop_C)
 
@@ -49,10 +59,10 @@ F_p_array = usample(F_p,60);
         %   and quickly try different orders for W1 and W2, use the syntax:
         %      [USYSnew,INFOnew] = ucover(PNOM,INFO,ORD1new,ORD2new)
 W_phi = Info_phi.W1;
-W_phi.InputName = {'phi_nom'};
+W_phi.InputName = {'delta_{lat}'};
 W_phi.OutputName = {'z1'};
 W_p = Info_p.W1;
-W_p.InputName = {'p_nom'};
+W_p.InputName = {'delta_{lat}'};
 W_p.OutputName = {'z2'};
 
 figure(500)
@@ -84,9 +94,9 @@ figure(507)
 sigma(tf(outerLoop_C),1/W_i) %nota:è la stessa cosa che fare le due funzioni una per una
 hold on
 figure(502)
-sigma(W_i*tf(outerLoop_C))%dovrebbe essere l'equivalente dell'M-delta form<1
-hold on
-[sigma_max_no_input_output,freq_peak_no_input_output] = hinfnorm(W_i*tf(outerLoop_C))
+% sigma(W_i*tf(outerLoop_C))%cazzata !
+% hold on
+% [sigma_max_no_input_output,freq_peak_no_input_output] = hinfnorm(W_i*tf(outerLoop_C))
 
 %% ROBUST STABILITY max singular value(M)=H_inf_norm(M)<1
 
@@ -94,7 +104,7 @@ hold on
 %% M_delta form MATLAB  NOTA: commentare le altre versioni di M_delta per vederne una
 %%questa versione è corretta ma mette nelle incertezze i singoli parametri
 %%di A-->delta è 4x4
-[M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop_C);
+[M_outerLoop_C,Delta_outerLoop_C,BLKSTRUCT] = lftdata(outerLoop_C);
 M_outerLoop_C.InputName = {'w1','w2','w3','w4','phi_0'};
 M_outerLoop_C.OutputName = {'z1','z2','z3','z4','p','phi'};
 
@@ -110,18 +120,30 @@ sigma(M_no_input_output)
 
 %prova mu
 omega=logspace(-3,2,500);
-bounds_mu=mussv(frd(M_no_input_output,omega),[1 0; 1 0; 1 0; 1 0]);
+bounds_mu=mussv(frd(M_no_input_output,omega),);%se si usa BLKSTRUCT (output di lfdata )
 
 figure(502)
-sigma(bounds_mu), grid
+sigma(bounds_mu)
+hold on
+grid
 %% M_delta form tentativo 1
-
-Sum_phi_n= sumblk('phi = w1 + phi_nom');
-Sum_p_n= sumblk('p = w2 + p_nom');
-SYSn.InputName = 'delta_{lat}'; 
-SYSn.OutputName = {'p_nom','phi_nom'};%nota: cambio i nomi degli output di SYSn !!
-M_outerLoop_C=connect(R_phi_C,R_p_C,SYSn(1),SYSn(2),Sum_phi,Sum_p,Sum_phi_n,Sum_p_n,W_phi,W_p,...
+%STRUTTURA DA RIFARE!!!!
+% Sum_phi_n= sumblk('phi = w1 + phi_nom');
+% Sum_p_n= sumblk('p = w2 + p_nom');
+% SYSn.InputName = 'delta_{lat}'; 
+% SYSn.OutputName = {'p_nom','phi_nom'};%nota: cambio i nomi degli output di SYSn !!
+% M_outerLoop_C=connect(R_phi_C,R_p_C,SYSn(1),SYSn(2),Sum_phi,Sum_p,Sum_phi_n,Sum_p_n,W_phi,W_p,...
+%     {'phi_0','w1','w2'},{'p','phi','z1','z2'});
+Sum_delta_phi= sumblk('delta_{lat}_{phi} = w1 + delta_{lat}');
+Sum_delta_p= sumblk('delta_{lat}_{p} = w2 + delta_{lat}');
+G_p=SYSn(1);
+G_phi=SYSn(2);
+G_p.InputName = 'delta_{lat}_{p}'; 
+G_phi.InputName = 'delta_{lat}_{phi}'; 
+M_outerLoop_C=connect(R_phi_C,R_p_C,G_p,G_phi,Sum_phi,Sum_p,Sum_delta_phi,Sum_delta_p,W_phi,W_p,...
     {'phi_0','w1','w2'},{'p','phi','z1','z2'});
+
+
 
 Delta_phi=ultidyn('Delta_phi',[1 1],'Bound',1);
 Delta_phi.InputName={'z1'};
@@ -130,7 +152,9 @@ Delta_p=ultidyn('Delta_p',[1 1],'Bound',1);
 Delta_p.InputName={'z2'};
 Delta_p.OutputName={'w2'};
 Delta_outerLoop_C= connect(Delta_phi,Delta_p,{'z1','z2'},{'w1','w2'});
-
+% Delta_outerLoop_C=ultidyn('Delta_outerLoop_C',[2 2],'Bound',1);
+% Delta_outerLoop_C.InputName={'z1','z2'};
+% Delta_outerLoop_C.OutputName={'w1','w2'};
 
 outerLoop_C_verifica=connect(Delta_outerLoop_C,M_outerLoop_C,'phi_0',{'p','phi'});
 
@@ -155,9 +179,9 @@ hold on
 sigma_max = getPeakGain(M_outerLoop_C) %dovrebbe essere mu per sistemi stabili
 sigma_max_no_input_output = getPeakGain(M_no_input_output)
 
-%prova mu
+%% prova mu
 omega=logspace(-3,2,500);
-bounds_mu=mussv(frd(M_no_input_output,omega),[1 0; 1 0]);
+bounds_mu=mussv(frd(M_no_input_output,omega),[2 0]);
 
 figure(502)
 sigma(bounds_mu), grid
@@ -181,7 +205,7 @@ figure(503)
 sigma(bounds_mu), grid
 %% Robust stability mu_analysys
 
-[gamma,~] = musynperf(M_outerLoop_C)
+[gamma,~] = musynperf(M_no_input_output)
 % omega=logspace(-3,2,500);
 %  bounds=mussv(frd(M_outerLoop_C,omega),);
 % % 
