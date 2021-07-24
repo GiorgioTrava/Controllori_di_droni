@@ -13,7 +13,8 @@ epsilon = 0.9;
 % numeratore = omega_n^2;
 % denominatore = [1, 2*omega_n*epsilon, omega_n^2];
 F_required = omega_n^2/(s^2+2*epsilon*omega_n*s+omega_n^2);%tf(numeratore, denominatore)
-y=step(F_required)
+
+y=step(F_required);
 stepinfo(y)
 % omega_n_2 = 15;
 % epsilon_2 = 0.9;
@@ -30,10 +31,10 @@ stepinfo(y)
 t_a=5/(epsilon*omega_n)
 perc_overshoot=exp(-pi*epsilon/sqrt(1-epsilon^2))*100
 
-
+W3_inv=makeweight(1,[(omega_n) 0.9],0.00001);%makeweight(1.1,omega_n,0.00001)
 
 figure(1)
-bode(F_required)
+bode(F_required,W3_inv)
 hold on, grid on
 % bode(F_required_2)
 % bode(F_required_3)
@@ -58,6 +59,7 @@ bode(W1_inv)
 legend
 
 L_required = F_required/(1-F_required);
+[G,fase] = margin(L_required)
 % L_required_2 = F_required_2/(1-F_required_2);
 % L_required_3 = F_required_3/(1-F_required_3);
 figure(3)

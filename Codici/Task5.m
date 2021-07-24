@@ -12,26 +12,95 @@
 
 outerLoop_C = connect(R_phi_C,R_p_C,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
 
-% Nyquist dell'open loop (con R condensato per output vettoriali)
 
+%% Poli e zeri, Nyquist, Bode funzioni in anello aperto
 %R_C=connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi_0','phi','p'},'delta_{lat}');
-L_interna=connect(SYS,R_p_C,'p_error',{'p','phi'});
-OpenLoop_C=minreal(-L_interna*R_phi_C)%minreal(SYSn*R_C);
-figure(321)
-nyquist(OpenLoop_C(2,1))
-ylim([-300 300])
-% Bode closed and open loop
-figure(320)
-bode(outerLoop_C)
-hold on
-xlim([1e-5 1e4])
-figure(320)
-bode(OpenLoop_C([1:2],1))
-legend('outerLoop_C','L')
-figure(322)
-margin(OpenLoop_C(2,1))
-figure(323)
-margin(OpenLoop_C(1,1))
+% L_interna=minreal(SYSn*R_p_C);
+% Anellochuso_interno=connect(SYSn,R_p_C,Sum_p,{'p_0'},{'p','phi'});
+% % L_interna=connect(SYSn,R_p_C,'p_error',{'p','phi'});
+% L_esterna_Anellochiuso_interno=minreal(Anellochuso_interno*R_phi_C);
+% L_esterna_tuttoaperto=minreal(SYSn*R_p_C*R_phi_C);%minreal(SYSn*R_C);
+% 
+% %poli e zeri funzioni in anello aperto
+% figure(200)
+% subplot(2,1,1)
+% pzmap(L_interna(1,1))
+% title('L interna 1')
+% subplot(2,1,2)
+% pzmap(L_interna(2,1))
+% title('L interna 2')
+% 
+% figure(201)
+% subplot(2,1,1)
+% pzmap(L_esterna_Anellochiuso_interno(1,1))
+% title('L esterna Anellochiuso interno 1')
+% subplot(2,1,2)
+% pzmap(L_esterna_Anellochiuso_interno(2,1))
+% title('L esterna Anellochiuso interno 2')
+% 
+% figure(202)
+% subplot(2,1,1)
+% pzmap(L_esterna_tuttoaperto(1,1))
+% title('L esterna tutto aperto 1')
+% subplot(2,1,2)
+% pzmap(L_esterna_tuttoaperto(2,1))
+% title('L esterna tutto aperto 2')
+% 
+% %Nyquist delle funzioni in anello aperto
+% figure(320)
+% nyquist(L_interna)
+% title('L interna')
+% xlim([-100 100]) 
+% ylim([-100 100])
+% 
+% figure(321)
+% nyquist(L_esterna_Anellochiuso_interno)
+% title('L esterna Anellochiuso interno')
+% xlim([-100 100]) 
+% ylim([-100 100])
+% 
+% figure(322)
+% nyquist(L_esterna_tuttoaperto)
+% title('L esterna tutto aperto')
+% xlim([-100 100]) 
+% ylim([-100 100])
+% 
+% %diagrammi di bode  con margini delle funzioni in anello aperto
+% figure(323)
+% subplot(2,1,1)
+% margin(L_interna(1,1))
+% subplot(2,1,2)
+% margin(L_interna(2,1))
+% legend('L interna')
+% 
+% figure(324)
+% subplot(2,1,1)
+% margin(L_esterna_Anellochiuso_interno(1,1))
+% subplot(2,1,2)
+% margin(L_esterna_Anellochiuso_interno(2,1))
+% legend('L esterna Anellochiuso interno')
+% 
+% figure(325)
+% subplot(2,1,1)
+% margin(L_esterna_tuttoaperto(1,1))
+% subplot(2,1,2)
+% margin(L_esterna_tuttoaperto(2,1))
+% legend('L esterna tutto aperto')
+% % % Bode closed and open loop
+% % figure(320)
+% % bode(outerLoop_C)
+% % hold on
+% % xlim([1e-5 1e4])
+% % figure(320)
+% % bode(L_esterna_tuttoaperto)
+% % legend('outerLoop_C','Open loop ')
+% 
+% 
+
+
+%% OVERBOUND DELL'ERRORE correggi i nomi!!!
+% [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop);
+% outerLoop_C=lft(Delta_outerLoop_C,M_outerLoop_C)
 
 F_p = outerLoop_C(1);%getIOTransfer(outerLoop_C,'phi_0','phi');%outerLoop_C(1)
 F_phi = outerLoop_C(2);
@@ -45,16 +114,13 @@ F_p_n = getNominal(F_p);
 F_p_n.InputName = {'delta_{lat}'};
 F_p_n.OutputName = {'p'};
 S_p = 1-F_p;
-%% OVERBOUND DELL'ERRORE
-% [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop);
-% outerLoop_C=lft(Delta_outerLoop_C,M_outerLoop_C)
 
+F_phi_array = usample(SYS(2,1),60);
 
-F_phi_array = usample(F_phi,60);
-[U_F_phi,Info_phi] = ucover(F_phi_array,F_phi_n,5);
+[U_F_phi,Info_phi] = ucover(F_phi_array,SYSn(2,1),5);
 
-F_p_array = usample(F_p,60);
-[U_F_p,Info_p] = ucover(F_p_array,F_p_n,5);
+F_p_array = usample(SYS(1,1),60);
+[U_F_p,Info_p] = ucover(F_p_array,SYSn(1,1),5);
    % NOTA:  USYS = ucover(PARRAY,PNOM,ORD) uses the simplified uncertainty model 
         %   USYS = PNOM*(I + W*ULTIDYN)
         %   where W is a scalar-valued filter of order ORD. This corresponds to 
@@ -132,7 +198,7 @@ omega=logspace(-3,2,500);
 
 [VDelta,VSigma,VLmi] = mussvextract(muinfo);
 
-VDelta 
+
 
 figure(502)
 sigma(bounds_mu(1))
