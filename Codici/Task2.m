@@ -12,15 +12,35 @@ pzmap(SYS)
 grid on, hold on
 pzmap(SYSn)
 legend('Uncertain poles and zeros', 'Nominal poles and zeros')
+% write the nominal value of pole 1
+text(-4.8,-0.4,'(-4.25; 0)')
+% write the nominal value of pole 2
+text(1.3,3.2,'(1.99; 3.60)')
+% write the nominal value of pole 3
+text(1.3,-3.2,'(1.99; -3.60)')
+% write the nominal value of zero
+text(-1,-0.4,'(-0.198; 0)')
 
 %% Bode plots
 %SYSarray=usample(SYS,100);
 
-figure (2)
-bode(SYS)
+opt_figure1 = bodeoptions;
+opt_figure1.Title.String = '\textbf{Bode Diagram}';
+opt_figure1.Title.Interpreter = 'latex';
+opt_figure1.Title.FontSize = 12;
+opt_figure1.XLabel.String = '\textbf{Frequency}';
+opt_figure1.XLabel.Interpreter = 'latex';
+opt_figure1.XLabel.FontSize = 10;
+opt_figure1.YLabel.String = {'\textbf{Magnitude}', '\textbf{Phase}'};
+opt_figure1.YLabel.Interpreter = 'latex';
+opt_figure1.YLabel.FontSize = 10;
+opt_figure1.Grid = 'on';
+
+figure(2)
+bode(SYS(2),'k--',opt_figure1)
 grid on, hold on
-bode(SYSn)
-legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+bode(SYSn(2),'r-',opt_figure1)
+legend('Uncertain model Bode diagram', 'Nominal model Bode diagram')
 
 %% Nyquist plot
 figure (3)
