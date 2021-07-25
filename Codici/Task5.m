@@ -1,4 +1,4 @@
-%% VERIFICA RS %%
+%% VERIFICA RS, MU ANALYSIS, RP  %%
 
 % clc, clear, close all
 

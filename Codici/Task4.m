@@ -1,4 +1,4 @@
-%% SCELTA GUADAGNI TUNING E VERIFICA %%
+%% SCELTA GUADAGNI TUNING E VERIFICA NP, NS %%
 
 % clc, clear, close all
  
@@ -20,14 +20,8 @@ numeratore_H_1 = omega_n_H_1^2;
 denominatore_H_1 = [1, 2*omega_n_H_1*ksi_H_1, omega_n_H_1^2];
 F_required_H_1 = tf(numeratore_H_1, denominatore_H_1);
 
-omega_n_H_2 = 39;
-ksi_H_2 = 0.9;
-numeratore_H_2 = omega_n_H_2^2;
-denominatore_H_2 = [1, 2*omega_n_H_2*ksi_H_2, omega_n_H_2^2];
-F_required_H_2 = tf(numeratore_H_2, denominatore_H_2);
-
 %% controllo------------------------------------------------------
-tipo_controllo = ['Hinf_1'] %possibilità: systune ; Hinf 
+tipo_controllo = ['systune'] %possibilità: systune ; Hinf 
 
 switch tipo_controllo
     case 'systune'
@@ -164,7 +158,9 @@ figure(28)
 pzmap((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
 legend('open loop controlled system')
 %% step responce
-step_controlled = stepinfo(outerLoop_n_C)
+step_controlled = stepinfo(outerLoop_n_C);
+step_controlled(1)
+step_controlled(2)
 %% verifica control effort per doublet di phi_0 %NOTA: da fare dopo il tuning!!!!
 
 t_f = 7;
