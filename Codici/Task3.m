@@ -29,7 +29,7 @@ outerLoop = connect(R_p,R_phi,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error'
 outerLoop_n = getNominal(outerLoop);
 
 %% Requisiti nominali su phi_0 phi
-s=tf('s');
+s = tf('s');
 omega_n = 10;
 ksi = 0.9;
 F_required = omega_n^2/(s^2+2*ksi*omega_n*s+omega_n^2);
@@ -47,10 +47,10 @@ bode(F_required,S_required,L_required)
 legend
 title('nominal sensitivities')
 
-% %overbound sensitivity (nominal performances)
-% s = tf('s');
-% W_p_inv = makeweight(0.0001,[omega_n 1],hinfnorm(S_required));
-% figure(10)
-% bode(S_required,W_p_inv)
-% legend('nominal sensitivities','1/Wp')
+%overbound sensitivity (nominal performances)
+s = tf('s');
+W_perf_inv = makeweight(0.0001,[omega_n 1],hinfnorm(S_required));
+figure(10)
+bode(S_required,W_perf_inv)
+legend('nominal sensitivities','1/Wp')
 

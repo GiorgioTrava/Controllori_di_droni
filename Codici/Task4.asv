@@ -27,7 +27,7 @@ denominatore_H_2 = [1, 2*omega_n_H_2*ksi_H_2, omega_n_H_2^2];
 F_required_H_2 = tf(numeratore_H_2, denominatore_H_2);
 
 %% controllo------------------------------------------------------
-tipo_controllo = ['Hinf_1'] %possibilità: systune ; Hinf 
+tipo_controllo=['Hinf_1'] %possibilità: systune ; Hinf 
 
 switch tipo_controllo
     case 'systune'
@@ -63,7 +63,7 @@ switch tipo_controllo
  
         s = tf('s');
 
-        L_req = makeweight(1000,omega_n_H_1,0.01);
+        L_req = makeweight(1000,omega_n_H_1,0.01);%(1+0.001*s/omega_n_H)/(0.001+s/omega_n_H);
         L_req.InputName = {'phi_error'}; 
         L_req.OutputName = {'phi_E_req'};
         
@@ -83,21 +83,21 @@ switch tipo_controllo
         opt = hinfstructOptions('Display','final','RandomStart',5);
         [SisTot_C,gamma,info] = hinfstruct(SisTot,opt);
         
-%         figure(11)
-%         impulse(F_required_H_1,'--r')
-%         hold on
-%         impulse(L_req/(1+L_req),'--k')
-% 
-%         figure(12)
-%         step(F_required_H_1,'--r')
-%         hold on
-%         step(L_req/(1+L_req),'--k')
+        figure(11)
+        impulse(F_required_H_1,'--r')
+        hold on
+        impulse(L_req/(1+L_req),'--k')
+
+        figure(12)
+        step(F_required_H_1,'--r')
+        hold on
+        step(L_req/(1+L_req),'--k')
         
         R_p_C = pid(SisTot_C.Blocks.R_p) 
         R_p_C.InputName = {'p_error'};       
         R_p_C.OutputName = {'delta_{lat}'};
 
-        R_phi_C = pid(SisTot_C.Blocks.R_phi) 
+        R_phi_C=pid(SisTot_C.Blocks.R_phi) 
         R_phi_C.InputName = {'phi_error'};       
         R_phi_C.OutputName = {'p_0'};
             
@@ -108,11 +108,10 @@ outerLoop_n_C = connect(R_p_C,R_phi_C,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'p
 
 %% NP 
 %plot sensitivities
-S_n_C = getSensitivity(outerLoop_n_C,'phi_error');
+S_n_C  = getSensitivity(outerLoop_n_C,'phi_error');
 figure(20)
 bode(S_n_C,S_required)
 legend('controlled system sensitivity','required sensitivity')
-
 %plot step response of inner loop
 % figure(21)
 % step(connect(SYSn,R_p_C,Sum_p,'p_0',{'p','phi'}))
@@ -167,10 +166,10 @@ legend('open loop controlled system')
 step_controlled = stepinfo(outerLoop_n_C)
 %% verifica control effort per doublet di phi_0 %NOTA: da fare dopo il tuning!!!!
 
-t_f = 7;
-timestep = 0.001;
-t = [0:timestep:t_f];
-doublet_phi_0 = interp1([0,1-timestep,1,3-timestep,3,5-timestep,5,t_f],[0,0,10,10,-10,-10,0,0],t);%deg!!!!!
+t_f=7;
+timestep=0.001;
+t=[0:timestep:t_f];
+doublet_phi_0=interp1([0,1-timestep,1,3-timestep,3,5-timestep,5,t_f],[0,0,10,10,-10,-10,0,0],t);%deg!!!!!
 figure(30)
 plot(t,doublet_phi_0,'--')
 hold on
@@ -179,9 +178,9 @@ plot([t(1) t(end)],[-5 -5],'-r')
 %funzione di trasferimento phi_0 delta_lat
 H1 = getIOTransfer(outerLoop_n_C,'phi_0','delta_{lat}');
 H2 = outerLoop_n_C(2);
-y = lsim(H1,doublet_phi_0*pi/180,t);
-y_phi = lsim(H2,doublet_phi_0*pi/180,t);
-y_req = lsim(F_required,doublet_phi_0*pi/180,t);
+y=lsim(H1,doublet_phi_0*pi/180,t);
+y_phi=lsim(H2,doublet_phi_0*pi/180,t);
+y_req=lsim(F_required,doublet_phi_0*pi/180,t);
 plot(t,y*180/pi)
 plot(t,y_phi*180/pi,'--k')
 plot(t,y_req*180/pi,'--g')
