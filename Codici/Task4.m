@@ -37,22 +37,22 @@ switch tipo_controllo
         %TuningGoal.Margins
         
         
-        Req3 = TuningGoal.Tracking('phi_0','phi',step_required.SettlingTime,0.0001,hinfnorm(S_required));
+        Req3 = TuningGoal.Tracking('phi_0','phi',step_required.RiseTime,0.0001,hinfnorm(S_required));
 %         Req4 = TuningGoal.Overshoot('phi_0','phi',2); 
 %         Req5 = TuningGoal.Gain('phi_error','delta_{lat}',0.34);
 %         Req6 = TuningGoal.LoopShape('phi',F_required);
-        Req7 = TuningGoal.WeightedGain('phi_error','delta_{lat}',makeweight(0.1,[25 1],3.5),[]);
+        Req7 = TuningGoal.WeightedGain('phi_error','delta_{lat}',makeweight(0.01,[25 1],3.5),[]);%25
         %Req = TuningGoal.Sensitivity(location,maxsens)
         %structured H_inf-->ucover-->sensitivity
 
         [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req3],[Req7]);
         %WF = getWeight(Req1,0)
 
-        figure(18)
+        figure(11)
         viewGoal(Req3,outerLoop_n_C)
         hold on
 
-        figure(19)
+        figure(12)
         viewGoal(Req7,outerLoop_n_C)
         hold on
         
@@ -68,6 +68,7 @@ switch tipo_controllo
         R_phi_C.InputName = {'phi_error'};       
         R_phi_C.OutputName = {'p_0'};
 
+        
     case 'Hinf_1' 
         %S_phi = getIOTransfer(outerLoop,'phi_0','phi_error');
         %%tf([1, 2*omega_n_2*epsilon_2, 0 ],[1, 2*omega_n_2*epsilon_2, omega_n_2^2]);%
@@ -246,53 +247,75 @@ switch tipo_controllo
 end
 %% ricostruzione sistema
 
-outerLoop_n_C= connect(R_p_C,R_phi_C,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
-S_n_C=1- outerLoop_n_C;   
-figure
-bode(S_n_C(2,1),S_required)
-%     %%nota come recuperare la TF da "Fixed-Structure H-infinity Synthesis
-%     %%with hinfstruct"
-%     T = hinfstruct(T0,opt);
-%     showTunable(T)
-%     C = getBlockValue(T,'C');
-%     F = getValue(F0,T.Blocks);  % propagate tuned parameters from T to F
- figure
- step(connect(SYSn,R_p_C,Sum_p,'p_0',{'p','phi'}))
+outerLoop_n_C = connect(R_p_C,R_phi_C,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}','p_0','phi','p'});
+
+S_n_C = 1 - outerLoop_n_C;   
+
 
 %% plot
+%plot sensitivities
 figure(20)
-impulse(F_required,'g')
-hold on
-impulse(outerLoop_n_C(2))
-legend
+bode(S_n_C(2,1),S_required)
+legend('controlled system sensitivity','required sensitivity')
+%plot step response of inner loop
+% figure(21)
+% step(connect(SYSn,R_p_C,Sum_p,'p_0',{'p','phi'}))
 
 figure(21)
-step(F_required,'g')
-hold on
-step(outerLoop_n_C(2))
-legend
+subplot(2,1,1)
+impulse(outerLoop_n_C(1))
+subplot(2,1,2)
+impulse(F_required,'g',outerLoop_n_C(2))
+legend('F_required','controlled system')
 
-figure(22) 
-bode(F_required,'g')
-hold on
-bode(outerLoop_n_C(2))
-legend
+figure(22)
+subplot(2,1,1)
+step(outerLoop_n_C(1))
+subplot(2,1,2)
+step(F_required,'g',outerLoop_n_C(2))
+legend('F_required','controlled system')
 
-figure(23) 
-bode(outerLoop_n_C)
-legend
+figure(23)
+subplot(2,1,1)
+bode(outerLoop_n_C(1))
+subplot(2,1,2)
+bode(F_required,'g',outerLoop_n_C(2))
+legend('F_required','controlled system')
 
+%% nominal stability NS
+%poles and zeros
 figure(24)
 pzmap(outerLoop_n_C)
-legend
+legend('controlled system')
 
+% disk margin
+L = getLoopTransfer(outerLoop_n_C,{'p','phi'},-1);
+[DM,MM] = diskmargin(L);
+DM(1)   %gain e phase margin con in loop aperto alla volta
+DM(2)
+MM      %unico affidabile-->controlla anche le combinazioni
+
+%MIMO Nyquist criterion , Bode, poles and zeros(no cancellations)
+
+figure(26)
+nyquist((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
+legend('open loop controlled system')
+ylim([-300 300])
+figure(27)
+bode((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
+legend('open loop controlled system')
+figure(28)
+pzmap((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
+legend('open loop controlled system')
+%% step responce
+step_controlled = stepinfo(outerLoop_n_C)
 %% verifica control effort per doublet di phi_0 %NOTA: da fare dopo il tuning!!!!
 
-t_f=20;
+t_f=7;
 timestep=0.001;
 t=[0:timestep:t_f];
 doublet_phi_0=interp1([0,1-timestep,1,3-timestep,3,5-timestep,5,t_f],[0,0,10,10,-10,-10,0,0],t);%deg!!!!!
-figure(8)
+figure(30)
 plot(t,doublet_phi_0,'--')
 hold on
 plot([t(1) t(end)],[5 5],'-r')

@@ -96,7 +96,12 @@ outerLoop_C = connect(R_phi_C,R_p_C,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_
 % % legend('outerLoop_C','Open loop ')
 % 
 % 
-
+%% robust stability margins
+[stabmarg,wcu] = robstab(outerLoop_C)
+%A robust stability margin greater than 1 means that the system is stable 
+%for all values of its modeled uncertainty. A robust stability margin less
+%than 1 means that the system becomes unstable for some values of the uncertain
+%elements within their specified ranges
 
 %% OVERBOUND DELL'ERRORE correggi i nomi!!!
 % [M_outerLoop_C,Delta_outerLoop_C] = lftdata(outerLoop);

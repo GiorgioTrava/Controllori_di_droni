@@ -108,6 +108,4 @@ stepplot(SYSn_closed(2,1))
 % % bode(G)
 % % legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 % 
-% 
-% 
-% poliezeri = zpk(SYS);
+
