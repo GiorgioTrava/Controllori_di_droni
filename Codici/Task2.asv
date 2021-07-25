@@ -26,14 +26,14 @@ figure(2)
 sigma(SYSn)
 hinfnorm(SYSn) 
 %% impulse and step response solo SYSn
-figure (3)
-subplot(2,1,1)
-impulseplot(SYS(1))
-axis([0 10 -2000 2000]);     
-
-subplot(2,1,2)
-impulseplot(SYS(2))
-axis([0 10 -1000 1000]); 
+% figure (3)
+% subplot(2,1,1)
+% impulseplot(SYS(1))
+% axis([0 10 -2000 2000]);     
+% 
+% subplot(2,1,2)
+% impulseplot(SYS(2))
+% axis([0 10 -1000 1000]); 
 
 figure (4)
 subplot(2,1,1)
@@ -71,24 +71,24 @@ nyquist(SYSn)
 legend('Nominalmodel Nyquist diagram') 
 
 %% impulse and step response SYSn con feedback
-SYSn_closed = [minreal(SYSn(1)/(1+SYSn(1))); minreal(SYSn(2)/(1+SYSn(2)))];
+SYSn_closed = [minreal(SYSn(1)/(1+SYSn(1))) minreal(SYSn(2)/(1+SYSn(2)))];
 
 figure (7)
 subplot(2,1,1)
-impulseplot(SYSn_closed(1,1))
+impulseplot(SYSn_closed(1))
 axis([0 10 -2000 2000]);     
 
 subplot(2,1,2)
-impulseplot(SYSn_closed(2,1))
+impulseplot(SYSn_closed(2))
 axis([0 10 -1000 1000]); 
 
 figure (8)
 subplot(2,1,1)
-stepplot(SYSn_closed(1,1))
+stepplot(SYSn_closed(1))
 axis([0 10 -1000 1000]);     
 
 subplot(2,1,2)
-stepplot(SYSn_closed(2,1))
+stepplot(SYSn_closed(2))
 axis([0 10 -1000 1000]); 
 
 
