@@ -1,4 +1,4 @@
-%% MODELLO DA REGOLARE INCERTO E NOMINALE (CON M_DELTA FORM) %%
+%% MODELLO DA REGOLARE INCERTO E NOMINALE + REQUISITI %%
 
 % clc, clear, close all
 
@@ -15,39 +15,36 @@ R_phi = tunablePID('R_phi', 'P');
 R_phi.InputName = {'phi_error'};       
 R_phi.OutputName = {'p_0'};
 %% Uncertain to be tuned complete system
+
 Sum_p = sumblk('p_error = p_0 - p');
 Sum_phi = sumblk('phi_error = phi_0 - phi');
-
 
 % innerLoop= connect(R_p,SYS,Sum_p,'p_0',{'p','phi'}),'delta_{lat}';
 % 
 % outerLoop= connect(R_phi,innerLoop,Sum_phi,'phi_0',{'p','phi'},);
 
-outerLoop= connect(R_p,R_phi,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
+outerLoop = connect(R_p,R_phi,SYS,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','p_0','delta_{lat}','phi'});
 
-% figure(6)
-% %pzmap(innerLoop)
-% grid on, 
-% pzmap(outerLoop)
-% %legend('inner loop poles and zeros', 'outer loop poles and zeros')
-% legend('outer loop poles and zeros')
-
-
-% figure (7)
-% %bode(innerLoop)
-% grid on, 
-% bode(outerLoop)
-% %legend('inner loop bode diagram', 'outer loop bode diagram')
-% legend('outer loop bode diagram')
 %% Nominal to be tuned complete system
-% innerLoop_n= connect(R_p,SYSn,Sum_p,'p_0',{'p','phi'},'delta_{lat}');
-% 
-% outerLoop_n= connect(R_phi,innerLoop_n,Sum_phi,'phi_0',{'p','phi'},'phi_error');
+outerLoop_n = getNominal(outerLoop);
 
-outerLoop_n= connect(R_p,R_phi,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'phi_error','delta_{lat}'});
+%% Requisiti nominali su phi_0 phi
+s=tf('s');
+omega_n = 10;
+ksi = 0.9;
+F_required = omega_n^2/(s^2+2*ksi*omega_n*s+omega_n^2);
+
+S_required = 1 - F_required;
+
+hinfnorm(S_required)
+
+L_required = F_required/(1-F_required);
+
+step_required = stepinfo(F_required)
+
+figure(9)
+bode(F_required,S_required,L_required)
+legend
+title('nominal sensitivities')
 
 
-%% M_delta form to be tuned complete system
-[M_outerLoop,Delta_outerLoop] = lftdata(outerLoop);
-% figure (8)
-% bode(lft(Delta_outerLoop,M_outerLoop))

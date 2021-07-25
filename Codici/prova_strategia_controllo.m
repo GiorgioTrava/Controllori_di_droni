@@ -9,10 +9,10 @@ run Task3
 %%
 s=tf('s');
 omega_n = 10;
-epsilon = 0.9;
+ksi = 0.9;
 % numeratore = omega_n^2;
 % denominatore = [1, 2*omega_n*epsilon, omega_n^2];
-F_required = omega_n^2/(s^2+2*epsilon*omega_n*s+omega_n^2);%tf(numeratore, denominatore)
+F_required = omega_n^2/(s^2+2*ksi*omega_n*s+omega_n^2);%tf(numeratore, denominatore)
 
 y=step(F_required);
 stepinfo(y)
@@ -28,8 +28,8 @@ stepinfo(y)
 % denominatore_3 = [1, 2*omega_n_3*epsilon_3, omega_n_3^2];
 % F_required_3 = tf(numeratore_3, denominatore_3);
 
-t_a=5/(epsilon*omega_n)
-perc_overshoot=exp(-pi*epsilon/sqrt(1-epsilon^2))*100
+t_a=5/(ksi*omega_n)
+perc_overshoot=exp(-pi*ksi/sqrt(1-ksi^2))*100
 
 W3_inv=makeweight(1,[(omega_n) 0.9],0.00001);%makeweight(1.1,omega_n,0.00001)
 

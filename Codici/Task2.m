@@ -1,4 +1,4 @@
-%% ANALISI MODELLO QUADROTOR (CON M_DELTA FORM) %%
+%% ANALISI MODELLO QUADROTOR  %%
 
 % clc, clear, close all
 
@@ -75,21 +75,21 @@ SYSn_closed = [minreal(SYSn(1)/(1+SYSn(1))); minreal(SYSn(2)/(1+SYSn(2)))];
 
 figure (7)
 subplot(2,1,1)
-impulseplot(SYSn_closed(1,1))
-axis([0 10 -2000 2000]);     
+impulseplot(SYSn_closed(1))
+% axis([0 10 -2000 2000]);     
 
 subplot(2,1,2)
-impulseplot(SYSn_closed(2,1))
-axis([0 10 -1000 1000]); 
+impulseplot(SYSn_closed(2))
+% axis([0 10 -1000 1000]); 
 
 figure (8)
 subplot(2,1,1)
 stepplot(SYSn_closed(1,1))
-axis([0 10 -1000 1000]);     
+% axis([0 10 -1000 1000]);     
 
 subplot(2,1,2)
 stepplot(SYSn_closed(2,1))
-axis([0 10 -1000 1000]); 
+% axis([0 10 -1000 1000]); 
 
 
 %% M_delta form of the plant
