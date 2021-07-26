@@ -34,15 +34,21 @@ switch tipo_controllo
 %         Req6 = TuningGoal.LoopShape('phi',F_required);
         Req2 = TuningGoal.WeightedGain('phi_error','delta_{lat}',makeweight(0.01,[25 1],3.5),[]);%25
 
-        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1],[Req2]);
-
         figure(11)
+        bodemag(1/makeweight(0.01,[25 1],3.5))
+        grid
+        legend('1/W_L')
+        
+        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1],[Req2]);
+        
+        figure(12)
         viewGoal(Req1,outerLoop_n_C)
         hold on
 
-        figure(12)
+        figure(13)
         viewGoal(Req2,outerLoop_n_C)
         hold on
+
         
         R_p_C = pid(outerLoop_n_C.Blocks.R_p)
         R_p_C.InputName = {'p_error'};       
@@ -104,7 +110,8 @@ outerLoop_n_C = connect(R_p_C,R_phi_C,SYSn,Sum_phi,Sum_p,'phi_0',{'p','phi'},{'p
 %plot sensitivities
 S_n_C = getSensitivity(outerLoop_n_C,'phi_error');
 figure(20)
-bode(S_n_C,S_required)
+bodemag(S_n_C,S_required)
+grid
 legend('controlled system sensitivity','required sensitivity')
 
 %plot step response of inner loop
@@ -128,14 +135,17 @@ legend('F_required','controlled system')
 figure(23)
 subplot(2,1,1)
 bode(outerLoop_n_C(1))
+grid
 subplot(2,1,2)
 bode(F_required,'g',outerLoop_n_C(2))
+grid
 legend('F_required','controlled system')
 
 %% nominal stability NS
 %poles and zeros
 figure(24)
 pzmap(outerLoop_n_C)
+grid
 legend('controlled system')
 
 % disk margin

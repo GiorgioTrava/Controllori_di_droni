@@ -33,17 +33,17 @@ s = tf('s');
 omega_n = 10;
 ksi = 0.9;
 F_required = omega_n^2/(s^2+2*ksi*omega_n*s+omega_n^2);
-F_required.InputName=''
-S_required = getSensitivity(F_required) %1 - F_required;
 
-hinfnorm(S_required)
+S_required = 1 - F_required;
+
 
 L_required = F_required/(1-F_required);
 
-step_required = stepinfo(F_required)
+step_required = stepinfo(F_required);
 
 figure(9)
-bode(F_required,S_required,L_required)
+bodemag(F_required,S_required,L_required)
+grid
 legend
 title('nominal sensitivities')
 

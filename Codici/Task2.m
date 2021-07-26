@@ -24,6 +24,7 @@ text(-1,-0.4,'(-0.198; 0)')
 %% Singular values e H_inf norm
 figure(2)
 sigma(SYSn)
+grid
 hinfnorm(SYSn) 
 %% impulse and step response solo SYSn
 figure (3)
@@ -67,7 +68,7 @@ hinfnorm(SYSn)
 %% Nyquist plot
 figure (6)
 grid on
-nyquist(SYSn)
+nyquist(SYSn(1))
 legend('Nominal model Nyquist diagram') 
 
 %% impulse and step response SYSn con feedback
