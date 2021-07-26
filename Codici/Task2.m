@@ -68,7 +68,7 @@ hinfnorm(SYSn)
 figure (6)
 grid on
 nyquist(SYSn)
-legend('Nominalmodel Nyquist diagram') 
+legend('Nominal model Nyquist diagram') 
 
 %% impulse and step response SYSn con feedback
 SYSn_closed = [minreal(SYSn(1)/(1+SYSn(1))); minreal(SYSn(2)/(1+SYSn(2)))];
