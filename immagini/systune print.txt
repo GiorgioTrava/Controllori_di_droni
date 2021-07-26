@@ -1,0 +1,63 @@
+tipo_controllo =
+
+    'systune'
+
+Final: Soft = 0.994, Hard = 0.9998, Iterations = 177
+
+R_p_C =
+ 
+             1            s    
+  Kp + Ki * --- + Kd * --------
+             s          Tf*s+1 
+
+  with Kp = 0.0507, Ki = 2.01, Kd = -0.397, Tf = 44.5
+ 
+R_phi_C =
+ 
+  Kp = 6.84
+  
+MM (disk margins)= 
+
+  struct with fields:
+
+           GainMargin: [0.5419 1.8455]
+          PhaseMargin: [-33.0964 33.0964]
+           DiskMargin: 0.5943
+           LowerBound: 0.5943
+           UpperBound: 0.5955
+            Frequency: 43.3024
+    WorstPerturbation: [2×2 ss]  
+	
+step response phi_0-->p = 
+
+  struct with fields:
+
+        RiseTime: 0
+    SettlingTime: 0.5530
+     SettlingMin: 0.0048
+     SettlingMax: 7.7730
+       Overshoot: Inf
+      Undershoot: 0
+            Peak: 7.7730
+        PeakTime: 0.0432
+		
+step response phi_0-->phi = 
+
+  struct with fields:
+
+        RiseTime: 0.3153
+    SettlingTime: 0.6125
+     SettlingMin: 0.9021
+     SettlingMax: 0.9953
+       Overshoot: 0
+      Undershoot: 0
+            Peak: 0.9953
+        PeakTime: 1.0983
+		
+sigma_max_no_input_output =
+
+    0.6134
+	
+Robust performance H_inf =
+
+    1.9373

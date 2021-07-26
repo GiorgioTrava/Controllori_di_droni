@@ -1,6 +1,6 @@
 %% MONTECARLO ANALYSIS
 close all
-N = 100; % Number of samples in the MC study
+N = 50; % Number of samples in the MC study
 
 Y_v_mc = zeros(N,1); % preallocation of the matrices
 Y_p_mc= zeros(N,1);
@@ -14,7 +14,7 @@ Pm = zeros(N,1);
 Sett = zeros(N,1);
 Over = zeros(N,1);
 
-F_mc=[];
+
 
 R1 = connect(Sum_phi,R_phi_C,{'phi_0' 'phi'},'p_0');
 R2 = connect(R1,Sum_p,{'phi_0' 'phi' 'p'},'p_error');
@@ -46,22 +46,24 @@ for n = 1:N
     
     
 %     L_mc = -SYS_mc*R_C;
-    F_mc(:,:,N) = connect(R_C,SYS_mc,'phi_0',{'phi','p'},{'p','phi'});
+    F_mc = connect(R_C,SYS_mc,'phi_0',{'phi','p'},{'p','phi'});
     
 %     figure(200)%!!!!
-%     pzmap(F_mc)
+%     pzmap(F_mc,'b')
 %     hold on
-%     legend('controlled system')
+%     grid on
+    %legend('controlled system')
 
-    L = getLoopTransfer(F_mc(:,),{'p','phi'},-1);
+    L = getLoopTransfer(F_mc,{'p','phi'},-1);
     [DM,MM] = diskmargin(L);
 
     Gm(n)=MM.DiskMargin;
     Pm(n)=MM.PhaseMargin(2);
     
-%     figure(201)%!!!!
-%     step(F_mc)
-%     hold on
+    figure(201)%!!!!
+    step(F_mc,'b')
+    title
+    hold on
     
     
     S = stepinfo(F_mc(1));

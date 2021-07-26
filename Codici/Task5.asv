@@ -46,14 +46,13 @@ error_phi = (tf(SYSn(2,1))-tf(SYS_phi_array))/tf(SYSn(2,1));%usample((outerLoop_
 bodemag(error_phi,W_phi)
 grid
 legend
-title('overbound degli errori')
+title('','')
 subplot(2,1,2)
 error_p = (tf(SYSn(1,1))-tf(SYS_p_array))/tf(SYSn(1,1));%usample((outerLoop_n_C(2)-outerLoop_C(2)),60);
 bodemag(error_p,W_p)
 grid
 xlim([10^-4 10^2])
 legend
-title('')
 
 %% M_delta form 
 
@@ -101,7 +100,7 @@ legend('sigma M','mu')
 
 W_i = [tf(W_p) 0; 0 tf(W_phi)];
 Wperf = 1/W_perf_inv; %performance
-
+figure(); bode(Wperf)
 
 figure(104)
 sigma((Wperf*ss(S_n_C)),(W_i*outerLoop_n_C))

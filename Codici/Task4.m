@@ -162,7 +162,7 @@ MM      %unico affidabile-->controlla anche le combinazioni
 
 figure(26)
 nyquist((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
-% grid
+grid
 legend('open loop controlled system')
 ylim([-300 300])
 figure(27)
@@ -186,15 +186,17 @@ doublet_phi_0 = interp1([0,1-timestep,1,3-timestep,3,5-timestep,5,t_f],[0,0,10,1
 figure(30)
 plot(t,doublet_phi_0,'--')
 hold on
-plot([t(1) t(end)],[5 5],'-r')
-plot([t(1) t(end)],[-5 -5],'-r')
 %funzione di trasferimento phi_0 delta_lat
 H1 = getIOTransfer(outerLoop_n_C,'phi_0','delta_{lat}');
 H2 = outerLoop_n_C(2);
 y = lsim(H1,doublet_phi_0*pi/180,t);
 y_phi = lsim(H2,doublet_phi_0*pi/180,t);
 y_req = lsim(F_required,doublet_phi_0*pi/180,t);
-plot(t,y*180/pi)
-plot(t,y_phi*180/pi,'--k')
+plot(t,y*180/pi,'m','LineWidth',1.5)
 plot(t,y_req*180/pi,'--g')
+plot(t,y_phi*180/pi,'--k')
+plot([t(1) t(end)],[5 5],'-r')
+plot([t(1) t(end)],[-5 -5],'-r')
+legend('doublet richiesta','delta lat','risposta richiesta','risposta effettiva','','')
+
 
