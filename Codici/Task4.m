@@ -162,7 +162,7 @@ MM      %unico affidabile-->controlla anche le combinazioni
 
 figure(26)
 nyquist((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
-grid
+% grid
 legend('open loop controlled system')
 ylim([-300 300])
 figure(27)
