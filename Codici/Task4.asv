@@ -123,7 +123,6 @@ subplot(2,1,1)
 impulse(outerLoop_n_C(1))
 subplot(2,1,2)
 impulse(F_required,'g',outerLoop_n_C(2))
-title ('')
 legend('F required','controlled system')
 
 figure(22)
@@ -131,7 +130,6 @@ subplot(2,1,1)
 step(outerLoop_n_C(1))
 subplot(2,1,2)
 step(F_required,'g',outerLoop_n_C(2))
-title ('')
 legend('F required','controlled system')
 
 figure(23)
@@ -141,7 +139,6 @@ grid
 subplot(2,1,2)
 bodemag(F_required,'g',outerLoop_n_C(2))
 grid
-title ('')
 legend('F required','controlled system')
 
 %% nominal stability NS
@@ -162,16 +159,13 @@ MM      %unico affidabile-->controlla anche le combinazioni
 
 figure(26)
 nyquist((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
-grid
 legend('open loop controlled system')
 ylim([-300 300])
 figure(27)
 bode((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
-grid
 legend('open loop controlled system')
 figure(28)
 pzmap((1+L(1,1))*(1+L(2,2))-L(1,2)*L(2,1))
-grid
 legend('open loop controlled system')
 %% step responce
 step_controlled = stepinfo(outerLoop_n_C);
