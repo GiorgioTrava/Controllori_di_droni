@@ -14,6 +14,7 @@ Pm = zeros(N,1);
 Sett = zeros(N,1);
 Over = zeros(N,1);
 
+F_mc=[];
 
 R1 = connect(Sum_phi,R_phi_C,{'phi_0' 'phi'},'p_0');
 R2 = connect(R1,Sum_p,{'phi_0' 'phi' 'p'},'p_error');
@@ -46,17 +47,22 @@ for n = 1:N
     
 %     L_mc = -SYS_mc*R_C;
     F_mc = connect(R_C,SYS_mc,'phi_0',{'phi','p'},{'p','phi'});
-     
+    
+%     figure(200)%!!!!
+%     pzmap(F_mc)
+%     hold on
+%     legend('controlled system')
+
     L = getLoopTransfer(F_mc,{'p','phi'},-1);
     [DM,MM] = diskmargin(L);
 
     Gm(n)=MM.DiskMargin;
     Pm(n)=MM.PhaseMargin(2);
-    % Computation of step response
-%     t=(0:.01:1);
-%     step(minreal(F_mc,[],false),t);
-%    
-%     y = step(minreal(F_mc,[],false),t);
+    
+%     figure(201)%!!!!
+%     step(F_mc)
+%     hold on
+    
     
     S = stepinfo(F_mc(1));
     
@@ -65,19 +71,19 @@ for n = 1:N
     
 end
 
-figure()
+figure(202)
 hist(Gm,N)
 title('Disk margin')
 
-figure()
+figure(203)
 hist(Pm,N)
 title('Phase margin')
 
-figure()
+figure(204)
 hist(Sett,N)
 title('Settling time')
 
-figure()
+figure(205)
 hist(Over,N)
 title('Percentage overshoot')
 % figure()

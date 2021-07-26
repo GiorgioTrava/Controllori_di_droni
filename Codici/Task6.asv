@@ -1,6 +1,6 @@
-%% Montecarlo analysis
-
-N = 5; % Number of samples in the MC study
+%% MONTECARLO ANALYSIS
+close all
+N = 100; % Number of samples in the MC study
 
 Y_v_mc = zeros(N,1); % preallocation of the matrices
 Y_p_mc= zeros(N,1);
@@ -14,14 +14,13 @@ Pm = zeros(N,1);
 Sett = zeros(N,1);
 Over = zeros(N,1);
 
+F_mc=[];
 
 R1 = connect(Sum_phi,R_phi_C,{'phi_0' 'phi'},'p_0');
 R2 = connect(R1,Sum_p,{'phi_0' 'phi' 'p'},'p_error');
 R_C = connect(R2,R_p_C,{'phi_0' 'phi' 'p'},'delta_{lat}');
 % R_C = tf(connect(R_p_C,R_phi_C,Sum_phi,Sum_p,{'phi','p','phi_0'},'delta_{lat}'));
 
-figure()
-hold on
 for n = 1:N
     % resampling of uncertain parameters
     Y_v_mc(n) = Y_v.NominalValue+Y_v.PlusMinus(2)*randn;
@@ -47,41 +46,46 @@ for n = 1:N
     
     
 %     L_mc = -SYS_mc*R_C;
-     F_mc = connect(R_C,SYS_mcn,'phi_0','phi');
-     
-     L = getLoopTransfer(outerLoop_n_C,{'p','phi'},-1);
+    F_mc(:,:,N) = connect(R_C,SYS_mc,'phi_0',{'phi','p'},{'p','phi'});
+    
+%     figure(200)%!!!!
+%     pzmap(F_mc)
+%     hold on
+%     legend('controlled system')
+
+    L = getLoopTransfer(F_mc(:,),{'p','phi'},-1);
     [DM,MM] = diskmargin(L);
-%     L_mc = F_mc/(1-F_mc);
-%     L_mc(n) = connect(R_p_C,R_phi_C,SYS_mc,Sum_phi,Sum_p,'phi_0','phi');
-%     bode(L_mc/(1+L_mc),F_required), hold on
-%     margin(outerLoop_mc(n))
-    [Gm(n),Pm(n)] = margin(L_mc);
+
+    Gm(n)=MM.DiskMargin;
+    Pm(n)=MM.PhaseMargin(2);
     
-    % Computation of step response
-%     t=(0:.01:1);
-%     step(minreal(F_mc,[],false),t);
-%    
-%     y = step(minreal(F_mc,[],false),t);
+%     figure(201)%!!!!
+%     step(F_mc)
+%     hold on
     
-    S = stepinfo(y);
+    
+    S = stepinfo(F_mc(1));
     
     Sett(n) = S.SettlingTime;
     Over(n) = S.Overshoot;
     
 end
 
-figure()
+figure(202)
 hist(Gm,N)
+title('Disk margin')
 
-figure()
+figure(203)
 hist(Pm,N)
+title('Phase margin')
 
-figure()
+figure(204)
 hist(Sett,N)
+title('Settling time')
 
-figure()
+figure(205)
 hist(Over,N)
-
+title('Percentage overshoot')
 % figure()
 % hist(Y_v_mc,N)
 % hold on

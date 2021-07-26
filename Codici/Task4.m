@@ -141,8 +141,8 @@ legend('controlled system')
 % disk margin
 L = getLoopTransfer(outerLoop_n_C,{'p','phi'},-1);
 [DM,MM] = diskmargin(L);
-DM(1)   %gain e phase margin con in loop aperto alla volta
-DM(2)
+% DM(1)   %gain e phase margin con in loop aperto alla volta
+% DM(2)
 MM      %unico affidabile-->controlla anche le combinazioni
 
 %MIMO Nyquist criterion , Bode, poles and zeros(no cancellations)
