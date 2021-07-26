@@ -28,20 +28,20 @@ switch tipo_controllo
 
 %         Req1 = TuningGoal.Transient('phi_0','phi',F_required_systune);
 %         Req2 = TuningGoal.Transient('phi_0','phi',F_required, 'step');      
-        Req3 = TuningGoal.Tracking('phi_0','phi',step_required.RiseTime,0.0001,hinfnorm(S_required));
+        Req1 = TuningGoal.Tracking('phi_0','phi',2/(omega_n-3),0.0001,hinfnorm(S_required));
 %         Req4 = TuningGoal.Overshoot('phi_0','phi',2); 
 %         Req5 = TuningGoal.Gain('phi_error','delta_{lat}',0.34);
 %         Req6 = TuningGoal.LoopShape('phi',F_required);
-        Req7 = TuningGoal.WeightedGain('phi_error','delta_{lat}',makeweight(0.01,[25 1],3.5),[]);%25
+        Req2 = TuningGoal.WeightedGain('phi_error','delta_{lat}',makeweight(0.01,[25 1],3.5),[]);%25
 
-        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req3],[Req7]);
+        [outerLoop_n_C,fSoft] = systune(outerLoop_n,[Req1],[Req2]);
 
         figure(11)
-        viewGoal(Req3,outerLoop_n_C)
+        viewGoal(Req1,outerLoop_n_C)
         hold on
 
         figure(12)
-        viewGoal(Req7,outerLoop_n_C)
+        viewGoal(Req2,outerLoop_n_C)
         hold on
         
         R_p_C = pid(outerLoop_n_C.Blocks.R_p)

@@ -33,8 +33,8 @@ s = tf('s');
 omega_n = 10;
 ksi = 0.9;
 F_required = omega_n^2/(s^2+2*ksi*omega_n*s+omega_n^2);
-
-S_required = 1 - F_required;
+F_required.InputName=''
+S_required = getSensitivity(F_required) %1 - F_required;
 
 hinfnorm(S_required)
 
@@ -51,6 +51,7 @@ title('nominal sensitivities')
 s = tf('s');
 W_perf_inv = makeweight(0.0001,[omega_n 1],hinfnorm(S_required));
 figure(10)
-bode(S_required,W_perf_inv)
+bodemag(S_required,W_perf_inv)
+grid
 legend('nominal sensitivities','1/Wp')
 
