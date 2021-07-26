@@ -1,0 +1,72 @@
+tipo_controllo =
+
+    'Hinf'
+
+Final: Peak gain = 8.88, Iterations = 52
+Final: Peak gain = 10.9, Iterations = 300
+       Some closed-loop poles are marginally stable (decay rate near 1e-07)
+Final: Peak gain = 7.99, Iterations = 94
+Final: Peak gain = 9.05, Iterations = 300
+       Some closed-loop poles are marginally stable (decay rate near 1e-07)
+Final: Peak gain = 9.28, Iterations = 300
+       Some closed-loop poles are marginally stable (decay rate near 1e-07)
+Final: Peak gain = 8.19, Iterations = 129
+
+R_p_C =
+ 
+             1            s    
+  Kp + Ki * --- + Kd * --------
+             s          Tf*s+1 
+
+  with Kp = -0.203, Ki = 1.54, Kd = 0.0573, Tf = 0.224
+
+R_phi_C =
+ 
+  Kp = 5.44
+  
+MM (disk margins)= 
+
+  struct with fields:
+
+           GainMargin: [0.4820 2.0747]
+          PhaseMargin: [-38.5320 38.5320]
+           DiskMargin: 0.6991
+           LowerBound: 0.6991
+           UpperBound: 0.7005
+            Frequency: 14.3917
+    WorstPerturbation: [2×2 ss]
+
+step response phi_0-->p = 
+
+  struct with fields:
+
+        RiseTime: 0
+    SettlingTime: 0.7275
+     SettlingMin: 0.0011
+     SettlingMax: 5.1287
+       Overshoot: Inf
+      Undershoot: 0
+            Peak: 5.1287
+        PeakTime: 0.0500
+
+
+step response phi_0-->phi =  
+
+  struct with fields:
+
+        RiseTime: 0.4325
+    SettlingTime: 0.7797
+     SettlingMin: 0.9006
+     SettlingMax: 0.9945
+       Overshoot: 0
+      Undershoot: 0
+            Peak: 0.9945
+        PeakTime: 2.0792
+		
+sigma_max_no_input_output =
+
+    0.6286
+
+Robust performance H_inf =
+
+    1.7923	

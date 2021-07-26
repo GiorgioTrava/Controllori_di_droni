@@ -21,7 +21,7 @@ denominatore_H_1 = [1, 2*omega_n_H_1*ksi_H_1, omega_n_H_1^2];
 F_required_H_1 = tf(numeratore_H_1, denominatore_H_1);
 
 %% controllo------------------------------------------------------
-tipo_controllo = ['systune'] %possibilità: systune ; Hinf 
+tipo_controllo = ['Hinf'] %possibilità: systune ; Hinf 
 
 switch tipo_controllo
     case 'systune'
