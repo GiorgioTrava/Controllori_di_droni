@@ -1,6 +1,6 @@
 %% MONTECARLO ANALYSIS
 close all
-N = 50; % Number of samples in the MC study
+N = 1000; % Number of samples in the MC study
 
 Y_v_mc = zeros(N,1); % preallocation of the matrices
 Y_p_mc= zeros(N,1);
@@ -60,9 +60,9 @@ for n = 1:N
     Gm(n)=MM.DiskMargin;
     Pm(n)=MM.PhaseMargin(2);
     
-    figure(201)%!!!!
-    step(F_mc,'b')
-    hold on
+%     figure(201)%!!!!
+%     step(F_mc,'b')
+%     hold on
     
     
     S = stepinfo(F_mc(1));
