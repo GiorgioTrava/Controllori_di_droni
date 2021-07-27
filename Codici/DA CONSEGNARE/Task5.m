@@ -101,7 +101,7 @@ legend('sigma M','mu')
 
 W_i = [tf(W_p) 0; 0 tf(W_phi)];
 Wperf = 1/W_perf_inv; %performance
-
+figure(); bode(Wperf)
 
 figure(104)
 sigma((Wperf*ss(S_n_C)),(W_i*outerLoop_n_C))

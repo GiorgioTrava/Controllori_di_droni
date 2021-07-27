@@ -57,7 +57,7 @@ for n = 1:N
     L = getLoopTransfer(F_mc,{'p','phi'},-1);
     [DM,MM] = diskmargin(L);
 
-    Gm(n)=MM.DiskMargin;
+    Gm(n)=MM.GainMargin(1);
     Pm(n)=MM.PhaseMargin(2);
     
 %     figure(201)%!!!!
@@ -74,7 +74,7 @@ end
 
 figure(202)
 hist(Gm,N)
-title('Disk margin')
+title('Gain margin')
 
 figure(203)
 hist(Pm,N)

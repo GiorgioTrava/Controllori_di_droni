@@ -68,7 +68,7 @@ hinfnorm(SYSn)
 %% Nyquist plot
 figure (6)
 grid on
-nyquist(SYSn(1))
+nyquist(SYSn)
 legend('Nominal model Nyquist diagram') 
 
 %% impulse and step response SYSn con feedback
@@ -93,20 +93,5 @@ stepplot(SYSn_closed(2,1))
 % axis([0 10 -1000 1000]); 
 
 
-%% M_delta form of the plant
-% [M_SYS,Delta_SYS] = lftdata(SYS);
-% 
-% figure (5)
-% bode(lft(Delta_SYS,M_SYS))
-% %norm(usample(SYS-lft(Delta,M),10),'inf')
-% % %% Frequency response function
-% % 
-% % SYSresponse = ufrd(SYS,logspace(-2,2,100))  
-% % 
-% % figure (3)
-% % bode(SYSresponse)
-% % grid on, hold on
-% % bode(G)
-% % legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
-% 
+ 
 
