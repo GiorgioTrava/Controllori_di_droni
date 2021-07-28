@@ -1,0 +1,18 @@
+%% AEROSPACE CONTROL SYSTEMS %%
+
+clc, clear , close all
+
+run task1,run task2, run task3
+
+%% nominal design (A)
+
+% nominal performances: equivalent to a second-order response with
+% Wn >= 10 rad/s and damping ratio >= 0.9
+
+
+HardReq = TuningGoal.ControllerPoles(['rrate','rangle'], 0 , 0.9 , Inf);
+SoftReq = TuninGoal
+
+inner_tuned = systune(outerloop,SoftReqs,HardReqs);
+outer_tuned
+
