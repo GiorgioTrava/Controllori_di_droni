@@ -39,6 +39,6 @@ SYS.OutputName = {'p','phi'};
 
 G = tf(SYS);
 G.InputName = 'DELTA_{lat}';
-G.OutputName = {'P','PHI'};
+G.OutputName = {'p','phi'};
 
 

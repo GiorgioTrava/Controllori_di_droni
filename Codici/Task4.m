@@ -15,5 +15,5 @@ run Task3
 HardReq = TuningGoal.ControllerPoles('outerLoop', 0 , 0.9 , Inf);
 SoftReq = TuningGoal.ControllerPoles('outerLoop', 0 , 0 , Inf);
 
-outer_tuned = systune(outerLoop,SoftReq,HardReq);
+[outer_tuned,fSoft,gHard] = systune(outerLoop,[SoftReq,HardReq]);
 

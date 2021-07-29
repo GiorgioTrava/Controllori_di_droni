@@ -39,4 +39,4 @@ legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 % bode(G)
 % legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 
-poliezeri = zpk(SYS)
+%poliezeri = zpk(SYS)
