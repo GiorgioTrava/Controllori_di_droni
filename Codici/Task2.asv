@@ -25,7 +25,7 @@ legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
 
 %% Nyquist plot
 
-figure (3) %diagramma di Nyquist sistema incerto e nominale
+figure (3)
 nyquist(SYS)
 grid on, hold on
 nyquist(G)

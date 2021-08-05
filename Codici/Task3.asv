@@ -19,7 +19,7 @@ R_p.OutputName = {'DELTA_{lat}'};
 
 innerloop = connect(R_p,G,{'p0','p'},{'p','phi'});
 sum = sumblk('ephi = phi0 - phi');
-outerloop = connect(R_phi,innerloop,sum,'phi0',{'phi','p'});
+outerloop = connect(R_phi,innerloop,sum,'phi0','phi');
 
 figure(4) %poli e zeri sistema retroazionato
 pzmap(outerloop)
