@@ -24,16 +24,35 @@ SoftReq = TuningGoal.StepTracking('phi0','phi',sys_ref);
 Options = systuneOptions('Display','final');
 [CL , fsoft , gHard] = systune(outerloop,SoftReq,HardReq,Options);
 
+
 figure(5)
 step(sys_ref)
 hold on
 step(CL(1,:))
-legend('reference
+legend('reference system step response','tuned system response')
 
 
 figure(6)
 pzplot(CL,'r',outerloop,'g')
 legend('tuned','not tuned')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

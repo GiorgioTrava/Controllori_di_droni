@@ -11,6 +11,8 @@ run Task3
 % nominal performances: equivalent to a second-order response with
 % Wn >= 10 rad/s and damping ratio >= 0.9
 
+% qui abbiamo uilizzato .Poles e Step Tracking
+
 zeta = 0.9;
 wn = 10;
 
@@ -34,7 +36,41 @@ legend('reference system step response','tuned system response')
 
 figure(6)
 pzplot(CL,'r',outerloop,'g')
-legend('tuned','not tuned')
+legend('tuned S.T.','not tuned')
+
+
+% qui utilizziamo la complementary sensitivity (.weightedGain)
+
+figure(7)
+bode(sys_ref)
+legend('desired complementary sensitivity function')
+
+Wl = 1;
+WR = sys_ref;
+Req = TuningGoal.WeightedGain('phi0','phi',Wl,WR);
+[CL1 , fsoft1] = systune(outerloop,Req);
+
+figure(8)
+pzplot(CL1,'r',outerloop,'g')
+legend('tuned W.G.','not tuned')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
