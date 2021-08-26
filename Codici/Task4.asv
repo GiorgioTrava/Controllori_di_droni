@@ -11,6 +11,8 @@ run Task3
 % nominal performances: equivalent to a second-order response with
 % Wn >= 10 rad/s and damping ratio >= 0.9
 
+% qui abbiamo uilizzato .Poles e Step Tracking
+
 zeta = 0.9;
 wn = 10;
 
@@ -19,10 +21,12 @@ denominator = [ 1 , 2*zeta*wn , wn^2];
 
 sys_ref = tf(numerator,denominator);
 
+%% Design con steptracking
+
 HardReq = TuningGoal.Poles(0,0.9,30); %bisogna capire quale wmax lasciare, per avere un sistema sensato
 SoftReq = TuningGoal.StepTracking('phi0','phi',sys_ref);
 Options = systuneOptions('Display','final');
-[CL , fsoft , gHard] = systune(outerloop,SoftReq,HardReq,Options);
+[CL , fsoft , gHard] = systune(sys_complete,SoftReq,HardReq,Options);
 
 
 figure(5)
@@ -33,12 +37,41 @@ legend('reference system step response','tuned system response')
 
 
 figure(6)
-pzplot(CL,'r',outerloop,'g')
-legend('tuned','not tuned')
+pzplot(CL,'r',sys_complete,'g')
+legend('tuned S.T.','not tuned')
+
+
+%% design con la sensitivity function(.weightedGain)
+
+
+figure(7)
+bode(sys_ref)
+legend('desired output dynamics')
+
+wb = 10; %regolo la banda di frequenze
+M = 3;  %regolo l'overshoot
+numerator_WR = [1/M , wb];
+denominator_WR = [1 , 0];
+Wl = 1;
+WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
+Req = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
+options = systuneOptions('RandomStart','UseParallel');
+[CL1 , fsoft1] = systune(sys_complete,Req); % ottimizzazione
 
 
 
+%% plt sensitivity, loop transfer function, 1/WR
 
+
+S = getIOTransfer( CL1,'phi0','ephi');
+L = G*R_p*R_phi;
+
+figure(8)
+bode(S)
+hold on
+bode(L(2))
+bode(1/WR)
+legend('Sensitivity function','loop transfer function','1/WR')
 
 
 

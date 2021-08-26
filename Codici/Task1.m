@@ -30,7 +30,7 @@ D = [0 0]';
 SYS = ss(A,B,C,D);
 
 SYS.StateName = {'v','p','phi'};
-SYS.InputName = 'delta_{lat}';
+SYS.InputName = 'DELTA_{lat}';
 SYS.OutputName = {'p','phi'};
 
 %% Transfer function
