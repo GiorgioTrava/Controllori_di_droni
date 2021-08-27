@@ -42,16 +42,26 @@ pzplot(CL,'r',G,'g')
 legend('tuned S.T.','uncontrolled')
 
 
-%% design con la sensitivity function(.weightedGain)
+%% design , mixed sensitivity (.weightedGain)
 
 
 wb = 6; %regolo la banda di frequenze
 M = 1.2;  %regolo l'overshoot
+A = 1;  % regolo il valore massimo prima della risonanza
 numerator_WR = [1/M , wb];
-denominator_WR = [1 , 0];
+denominator_WR = [1 , A*wb];
 Wl = 1;
 WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
-Req = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
+Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
+
+% control sensitivity
+
+
+Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
+Req = [ Req1 , Req2 ]; % vettore dei requirements
+
+% design
+
 %options = systuneOptions('RandomStart','UseParallel'); %uso il random start essendo il problema non convesso (structured mixed sensitivity)
 [CL1 , fsoft1] = systune(sys_complete,Req); % ottimizzazione
 
@@ -64,10 +74,7 @@ S = getIOTransfer( CL1,'phi0','ephi');
 L = getLoopTransfer(CL1,'phi');
 
 figure(8)
-bode(S)
-hold on
-bode(L)
-bode(1/WR)
+bode(S,L,1/WR)
 legend('Sensitivity function','loop transfer function','1/WR')
 title('tuned system with mixed sensitivity')
 
@@ -84,37 +91,30 @@ title('step response')
 
 figure(10)
 pzplot(CL1,'r',G,'g')
-legend('tuned','uncontrolled')
+legend('tuned','plant')
 title('poles and zeros of the tuned system with mixed sensitivity')
 
 
-%% control effort limitation (B)
+% %% control effort limitation (B)
+% 
+% [CL2 , fsoft1] = systune(CL1,Req1); % ottimizzazione control limitation
 
-% control sensitivity
 
-wb1 = 10; %regolo la banda di frequenze
-M1 = 70;  %regolo l'overshoot
-numerator_WR1 = [1/M1 , wb1];
-denominator_WR1 = [1 , 0];
-Wl = 1;
-WR1 = tf(numerator_WR1,denominator_WR1); % costruisco la funzione peso
-Req1 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
-[CL2 , fsoft1] = systune(CL1,Req1); % ottimizzazione control limitation
+%% plt control sensitivity
 
-%% plt sensitivity, loop transfer function, 1/WR
-
-Q = getIOTransfer(CL2,'phi0','DELTA_{lat}'); 
-R = getIOTransfer(CL2,'ep','DELTA_{lat}');
+Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
+R = getIOTransfer(CL1,'ep','DELTA_{lat}');
 
 figure(11)
-bode(Q,'c',L,'r',R,'g')
-
-bode(G(2),'b')
-bode(1/WR1)
+bode(Q,'c',L,'r',R,'g',G(2),'b',1/WR1,'y')
+grid on
 legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
 title('tuning control effort limitation')
 
+%step response control variable
 
+figure(12)
+step(Q)
 
 
 
