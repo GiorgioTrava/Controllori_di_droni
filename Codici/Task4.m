@@ -46,9 +46,12 @@ legend('tuned S.T.','uncontrolled')
 
 % nominal performance
 
-wb = 8; %regolo la banda di frequenze
-M = 1.25;  %regolo l'overshoot
-A = 0.1;  % regolo il valore massimo prima della risonanza
+%wb = 8; %regolo la banda di frequenze
+%M =0.9;  %regolo l'overshoot
+%A = 0.1;  % regolo il valore massimo prima della risonanza
+for wb=1:1:10
+    for M=0.1:0.5:2
+        for A=1:0.5:10
 numerator_WR = [1/M , wb];
 denominator_WR = [1 , A*wb];
 Wl = 1;
@@ -65,8 +68,9 @@ Req = [ Req1 , Req2 ]; % vettore dei requirements
 
 %options = systuneOptions('RandomStart','UseParallel'); %uso il random start essendo il problema non convesso (structured mixed sensitivity)
 [CL1 , fsoft1] = systune(sys_complete,Req); % ottimizzazione
-
-
+        end
+    end
+end
 
 %% plt sensitivity, loop transfer function, 1/WR
 
