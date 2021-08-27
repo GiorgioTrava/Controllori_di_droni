@@ -44,11 +44,10 @@ legend('tuned S.T.','uncontrolled')
 
 %% design , mixed sensitivity (.weightedGain)
 
-% nominal performance
 
-wb = 8; %regolo la banda di frequenze
-M = 1.25;  %regolo l'overshoot
-A = 0.1;  % regolo il valore massimo prima della risonanza
+wb = 6; %regolo la banda di frequenze
+M = 1.2;  %regolo l'overshoot
+A = 1;  % regolo il valore massimo prima della risonanza
 numerator_WR = [1/M , wb];
 denominator_WR = [1 , A*wb];
 Wl = 1;
@@ -57,7 +56,7 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % control sensitivity
 
-WR1 = tf( 4 , 1 );
+
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
 
@@ -82,13 +81,11 @@ title('tuned system with mixed sensitivity')
 %risposta a step
  
 figure(9)
-grid on
 step(sys_ref)
 hold on
 step(CL1(2))
 legend('reference system step response','tuned with mixed sensitivity')
 title('step response')
-
 
 % mappa poli e zeri
 
@@ -103,7 +100,7 @@ title('poles and zeros of the tuned system with mixed sensitivity')
 % [CL2 , fsoft1] = systune(CL1,Req1); % ottimizzazione control limitation
 
 
-% plt control sensitivity
+%% plt control sensitivity
 
 Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
 R = getIOTransfer(CL1,'ep','DELTA_{lat}');
