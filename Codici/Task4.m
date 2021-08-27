@@ -97,12 +97,6 @@ pzplot(CL1,'r',G,'g')
 legend('tuned','plant')
 title('poles and zeros of the tuned system with mixed sensitivity')
 
-
-% %% control effort limitation (B)
-% 
-% [CL2 , fsoft1] = systune(CL1,Req1); % ottimizzazione control limitation
-
-
 % plt control sensitivity
 
 Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
@@ -114,10 +108,36 @@ grid on
 legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
 title('tuning control effort limitation')
 
-%step response control variable
+% step response control variable
+
+t = linspace(0,6,612);
+tpast1 = 2;
+tpast2 = 4;
+u1 = 10*rectpuls(t - tpast1, 2);
+u2 = -10*rectpuls(t - tpast2, 2);
+u = u1 + u2;
+
+%simulo con questo input
+
+[num ,den] = tfdata(Q , 'v');
+Q1 = tf(num,den,'InputDelay',7);
+y1 = 10*step(Q,10);
+y2 = -10*step(Q1,10);
+y = y1 + y2;
 
 figure(12)
-step(Q)
+plot(t,u);
+hold on
+grid on
+plot(t,y);
+ylabel('amplitude')
+xlabel('time')
+title('doublet change in input')
+legend('input','output')
+
+
+
+
 
 
 
