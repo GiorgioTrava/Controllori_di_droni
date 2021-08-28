@@ -60,6 +60,7 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 wb1 = 8; %regolo la banda di frequenze
 M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
 A1 = 0.5;  % regolo il valore massimo prima della risonanza
+
 numerator_WR1 = [1/M1 , wb1];
 denominator_WR1 = [1 , A1*wb1];
 %WR1 = tf( 2.8 , [1 ,0 ] ); % prova con funzione peso costante in frequenza
@@ -70,7 +71,9 @@ Req = [ Req1 , Req2 ]; % vettore dei requirements
 % design
 
 %options = systuneOptions('RandomStart','UseParallel'); %uso il random start essendo il problema non convesso (structured mixed sensitivity)
-[CL1 , fsoft1] = systune(sys_complete,Req); % ottimizzazione
+N=10; %numero di optimizations aggiuntive partendo da valori random
+options=systuneOptions('RandomStart',N);
+[CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
 
 
 
