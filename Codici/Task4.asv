@@ -57,7 +57,13 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % control sensitivity
 
-WR1 = tf( 4 , 1 );
+wb1 = 8; %regolo la banda di frequenze
+M1 = 3;  %regolo l'overshoot, 
+A1 = 0.5;  % regolo il valore massimo prima della risonanza
+numerator_WR1 = [1/M1 , wb1];
+denominator_WR1 = [1 , A1*wb1];
+%WR1 = tf( 2.8 , [1 ,0 ] ); % prova con funzione peso costante in frequenza
+WR1 = tf( numerator_WR1 , denominator_WR1 );
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
 
@@ -110,7 +116,7 @@ title('tuning control effort limitation')
 
 % step response control variable
 
-t = 0:0.001:6;
+t = linspace(0,6,612);
 tpast1 = 2;
 tpast2 = 4;
 u1 = 10*rectpuls(t - tpast1, 2);
@@ -119,23 +125,17 @@ u = u1 + u2;
 
 %simulo con questo input
 
-y = lsim(CL1(2),u,t);
-
+y = lsim(Q,u,t);
 
 figure(12)
 plot(t,u);
 hold on
 grid on
-plot(t,y)
-ylabel('phi0')
+plot(t,y);
+ylabel('amplitude')
 xlabel('time')
-title('doublet change in input')
-
-%simulo con questo input
-
-y = lsim(CL1(2),u,t);
-figure(13)
-plot(t,y)
+title('control effort')
+legend('input','output')
 
 
 
