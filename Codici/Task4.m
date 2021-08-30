@@ -57,10 +57,19 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % control sensitivity
 
-wb1 = 8; %regolo la banda di frequenze
-M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
-A1 = 0.5;  % regolo il valore massimo prima della risonanza
+%wb1 = 8; %regolo la banda di frequenze
+%M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
+%A1 = 0.5;  % regolo il valore massimo prima della risonanza
 
+h=0;
+%CAMBIARE RANGE VALORI CICLO FOR E N DI RANDOMSTART A PIACERE
+for wb1=7:10
+    for M1=0.2:0.1:0.4
+        for A1=0.3:0.1:0.6
+            h=h+1;
+            A1_vec(h)=A1;
+            M1_vec(h)=M1;
+            wb1_vec(h)=wb1;
 numerator_WR1 = [1/M1 , wb1];
 denominator_WR1 = [1 , A1*wb1];
 %WR1 = tf( 2.8 , [1 ,0 ] ); % prova con funzione peso costante in frequenza
@@ -71,9 +80,18 @@ Req = [ Req1 , Req2 ]; % vettore dei requirements
 % design
 
 %options = systuneOptions('RandomStart','UseParallel'); %uso il random start essendo il problema non convesso (structured mixed sensitivity)
-N=10; %numero di optimizations aggiuntive partendo da valori random
+N=0; %numero di optimizations aggiuntive partendo da valori random
 options=systuneOptions('RandomStart',N);
 [CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
+fsoft1_vec(h)=max(fsoft1); %vettore che racchiude i valori massimi di Soft (che è un vettore binario) per ogni iterazione
+        end
+    end
+end
+opt=min(fsoft1_vec); %trova il minimo (ottimale) Soft nel vettore
+position=find(fsoft1_vec==opt); %trova la posizione del valore Soft minimo (ottimale)
+wb1_opt=wb1_vec(position) %trovano i valori delle variabili nella posizione del Soft ottimale
+M1_opt=M1_vec(position)
+A1_opt=A1_vec(position) 
 
 
 
