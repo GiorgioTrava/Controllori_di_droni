@@ -25,7 +25,7 @@ S_req = 1 - sys_ref ;
 HardReq = TuningGoal.Poles(0,0.9,50); %bisogna capire quale wmax lasciare, per avere un sistema sensato
 SoftReq = TuningGoal.StepTracking('phi0','phi',sys_ref);
 Options = systuneOptions('Display','final');
-[CL , fsoft , gHard] = systune(sys_complete,SoftReq,HardReq,Options);
+[CL , fsoft , gHard] = systune(sys_complete_n,SoftReq,HardReq,Options);
 
 %risposta a step
 
@@ -64,7 +64,7 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % numerator_WR1 = [1/M1 , wb1];
 % denominator_WR1 = [1 , 0];
-WR1 = 10*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
+WR1 = 3.35*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
 % WR1 = tf( numerator_WR1 , denominator_WR1 );
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
@@ -73,24 +73,53 @@ Req = [ Req1 , Req2 ]; % vettore dei requirements
 
 % design
 
-N=1; %numero di optimizations aggiuntive partendo da valori random
+N=0; %numero di optimizations aggiuntive partendo da valori random
 options = systuneOptions('RandomStart',N);
-[CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
+[CL1 , fsoft1] = systune(sys_complete_n,Req,options); % ottimizzazione
+
+pid(CL1.Blocks.rrate)
+pid(CL1.Blocks.rangle)
+
+settlingtime_tuned = stepinfo(CL1(2)).SettlingTime
+settlingtime_required = stepinfo(sys_ref).SettlingTime
+
+overshoot_tuned = stepinfo(CL1(2)).Overshoot
+overshoot_required = stepinfo(sys_ref).Overshoot
+
+%% nominal stability
+
+CL1_n = getNominal(CL1);
+figure()
+nyquist(CL1_n)
+legend('tuned nominal model')
+title('nyquist plot')
+pole(CL1_n)
+[Gm_phi,Pm_phi] = margin(CL1_n(2)); % returns gain margin, phase margin
+[Gm_p,Pm_p] = margin(CL1_n(1)); % returns gain margin, phase margin
+
+
+%% robust stability
+
+[M,Delta] = lftdata(CL1); % m-delta form
+
+
 
 
 %% plt sensitivity, loop transfer function, 1/WR
 
 
-S = getIOTransfer( CL1,'phi0','ephi');
-L = getLoopTransfer(CL1,'phi');
+S = minreal(getIOTransfer( CL1,'phi0','ephi'));
+L = minreal(getLoopTransfer(CL1,'phi'));
 
 figure(8)
 bode(S,L,1/WR)
+grid on
 legend('Sensitivity function','loop transfer function','1/WR')
 title('tuned system with mixed sensitivity')
 
 figure()
 bode(S_req,S,1/WR)
+grid on
 legend('required sensitivity','sensitivity','weight')
 
 
@@ -114,13 +143,13 @@ title('poles and zeros of the tuned system with mixed sensitivity')
 
 % plt control sensitivity
 
-Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
-R = getIOTransfer(CL1,'ep','DELTA_{lat}');
+Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}')); 
+R = minreal(getIOTransfer(CL1,'ep','DELTA_{lat}'));
 
 figure(11)
-bode(Q,'c',L,'r',R,'g',G(2),'b',WR1,'y')
+bode(Q,'c',L,'r',R,'g',G(2),'b',1/WR1,'y')
 grid on
-legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','weight')
+legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
 title('tuning control effort limitation')
 
 % step response control variable
