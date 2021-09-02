@@ -53,7 +53,7 @@ legend('tuned S.T.','uncontrolled')
 % numerator_WR = [1/M , wb];
 % denominator_WR = [1 , 0];
 Wl = 1;
-% WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso 
+% WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
 WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
 Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
 
