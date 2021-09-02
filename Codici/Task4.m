@@ -6,7 +6,7 @@ run Task1
 run Task2
 run Task3
 
-%% nominal design (A)
+%% output richiesto
 
 % nominal performances: equivalent to a second-order response with
 % Wn >= 10 rad/s and damping ratio >= 0.9
@@ -47,23 +47,24 @@ legend('tuned S.T.','uncontrolled')
 
 % nominal performance
 
-wb = 10; %regolo la banda di frequenze
-M = 1.1;  %regolo l'overshoot
-
-numerator_WR = [1/M , wb];
-denominator_WR = [1 , 0];
+% wb = 10; %regolo la banda di frequenze
+% M = 1.1;  %regolo l'overshoot
+% 
+% numerator_WR = [1/M , wb];
+% denominator_WR = [1 , 0];
 Wl = 1;
-WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
+% WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
+WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
 Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
 
 % control sensitivity
 
-wb1 = 8; %regolo la banda di frequenze
-M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
+% wb1 = 8; %regolo la banda di frequenze
+% M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
 
 % numerator_WR1 = [1/M1 , wb1];
 % denominator_WR1 = [1 , 0];
-WR1 = tf( 1 , 1 ); % prova con funzione peso costante in frequenza
+WR1 = 10*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
 % WR1 = tf( numerator_WR1 , denominator_WR1 );
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
@@ -76,8 +77,6 @@ N=1; %numero di optimizations aggiuntive partendo da valori random
 options = systuneOptions('RandomStart',N);
 [CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
 
-figure()
-bode(S_req,WR)
 
 %% plt sensitivity, loop transfer function, 1/WR
 
@@ -89,6 +88,11 @@ figure(8)
 bode(S,L,1/WR)
 legend('Sensitivity function','loop transfer function','1/WR')
 title('tuned system with mixed sensitivity')
+
+figure()
+bode(S_req,S,1/WR)
+legend('required sensitivity','sensitivity','weight')
+
 
 %risposta a step
  
@@ -114,9 +118,9 @@ Q = getIOTransfer(CL1,'phi0','DELTA_{lat}');
 R = getIOTransfer(CL1,'ep','DELTA_{lat}');
 
 figure(11)
-bode(Q,'c',L,'r',R,'g',G(2),'b',1/WR1,'y')
+bode(Q,'c',L,'r',R,'g',G(2),'b',WR1,'y')
 grid on
-legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
+legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','weight')
 title('tuning control effort limitation')
 
 % step response control variable
