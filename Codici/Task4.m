@@ -88,28 +88,29 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 
 %% nominal stability
 
-CL1_n = getNominal(CL1);
+L = [];
+L(1,1) = tf(getIOTransfer(CL1,'ephi','phi'));
+L(2,1) = tf(getIOTransfer(CL1,'ephi','p'));
+I = eye(2);
+c1 = det(I + tf(L));
 figure()
-nyquist(CL1_n)
-legend('tuned nominal model')
-title('nyquist plot')
-pole(CL1_n)
-[Gm_phi,Pm_phi] = margin(CL1_n(2)); % returns gain margin, phase margin
-[Gm_p,Pm_p] = margin(CL1_n(1)); % returns gain margin, phase margin
-
+nyquist(c1)
 
 %% robust stability
 
 [M,Delta] = lftdata(CL1); % m-delta form
-
-
+F = getIOTransfer(CL1,'phi0',{'phi','p'});
+G_n = getNominal(G);
+W = (G - G_n) / G_n ;
+figure()
+bode(F,1/W)
+grid on;
 
 
 %% plt sensitivity, loop transfer function, 1/WR
 
 
 S = minreal(getIOTransfer( CL1,'phi0','ephi'));
-L = minreal(getLoopTransfer(CL1,'phi'));
 
 figure(8)
 bode(S,L,1/WR)
