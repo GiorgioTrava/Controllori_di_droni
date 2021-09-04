@@ -88,23 +88,22 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 
 %% nominal stability
 
-L = [];
-L(1,1) = tf(getIOTransfer(CL1,'ephi','phi'));
-L(2,1) = tf(getIOTransfer(CL1,'ephi','p'));
+Closed_l = minreal(getIOTransfer(CL1,'phi0',{'p','phi'}));
+L = G*R_phi*R_p; % funzione di trasferimento in anello aperto
+L1 = tf(L);
+L2 = [ 1 , 0 ];
+L_n = L1*L2;
 I = eye(2);
-c1 = det(I + tf(L));
-figure()
-nyquist(c1)
+c1 = I + L_n;
+pole(L)
+nyquist(c1(1,1))
 
 %% robust stability
 
 [M,Delta] = lftdata(CL1); % m-delta form
-F = getIOTransfer(CL1,'phi0',{'phi','p'});
+F = getIOTransfer(CL1,'phi0',{'p','phi'});
 G_n = getNominal(G);
-W = (G - G_n) / G_n ;
-figure()
-bode(F,1/W)
-grid on;
+
 
 
 %% plt sensitivity, loop transfer function, 1/WR
@@ -113,7 +112,7 @@ grid on;
 S = minreal(getIOTransfer( CL1,'phi0','ephi'));
 
 figure(8)
-bode(S,L,1/WR)
+bode(S,Closed_l,1/WR)
 grid on
 legend('Sensitivity function','loop transfer function','1/WR')
 title('tuned system with mixed sensitivity')
@@ -148,7 +147,7 @@ Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}'));
 R = minreal(getIOTransfer(CL1,'ep','DELTA_{lat}'));
 
 figure(11)
-bode(Q,'c',L,'r',R,'g',G(2),'b',1/WR1,'y')
+bode(Q,'c',Closed_l,'r',R,'g',G(2),'b',1/WR1,'y')
 grid on
 legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
 title('tuning control effort limitation')
