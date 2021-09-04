@@ -89,38 +89,69 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 %% nominal stability
 
 Closed_l = minreal(getIOTransfer(CL1,'phi0',{'p','phi'}));
-L = G*R_phi*R_p; % funzione di trasferimento in anello aperto
+L = G*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
 L1 = tf(L);
 L2 = [ 1 , 0 ];
 L_n = L1*L2;
 I = eye(2);
 c1 = I + L_n;
+[num,den] = tfdata(c1(1,1),'v'); % extract pole polinomial of the closed and open loop
+disp('check if open loop poles correspond')
 pole(L)
-nyquist(c1(1,1))
+roots(den)
+disp('------------------------------')
+disp('check if closed loop poles correspond')
+pole(Closed_l)
+roots(num)
+
+figure()
+bode(minreal(c1(1,1)))
+figure
+nyquistplot(minreal(c1(1,1)))
+
 
 %% robust stability
 
-[M,Delta] = lftdata(CL1); % m-delta form
-F = getIOTransfer(CL1,'phi0',{'p','phi'});
-G_n = getNominal(G);
 
+R_p_c = pid(CL1.Blocks.rrate);
+R_phi_c = pid(CL1.Blocks.rangle);
+
+R_p_c.InputName = {'ep'};
+R_p_c.OutputName = {'DELTA_{lat}'};
+
+R_phi_c.InputName = {'ephi'};
+R_phi_c.OutputName = {'p0'};
+
+
+CL1_unc = connect(G,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'});
+[M,Delta] = lftdata(CL1_unc); % m-delta form
+M.InputName = {'w','phi0'};
+M.OutputName = {'z','p','phi'};
+Delta.InputName = {'z'};
+Delta.OutputName = {'w'};
+CL1_mdelta = connect(Delta,M,'phi0',{'p','phi'});
+M2 = tf(M);
+M1 = [ 1 , 0 ];
+%M = M2*M1;
+% s = svd(M);
+[sv,wfreq]=sigma(M);
+
+figure()
+bode(CL1_unc,CL1_mdelta)
 
 
 %% plt sensitivity, loop transfer function, 1/WR
 
+F = minreal(getIOTransfer(CL1,'phi0',{'p','phi'}));
 
-S = minreal(getIOTransfer( CL1,'phi0','ephi'));
+% plot sensitivity
+
+S = minreal(getIOTransfer( CL1,'phi0','ephi')); % sensitivity
 
 figure(8)
-bode(S,Closed_l,1/WR)
-grid on
-legend('Sensitivity function','loop transfer function','1/WR')
-title('tuned system with mixed sensitivity')
-
-figure()
 bode(S_req,S,1/WR)
 grid on
-legend('required sensitivity','sensitivity','weight')
+legend('required sensitivity','sensitivity','1/WR')
 
 
 %risposta a step
@@ -147,9 +178,9 @@ Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}'));
 R = minreal(getIOTransfer(CL1,'ep','DELTA_{lat}'));
 
 figure(11)
-bode(Q,'c',Closed_l,'r',R,'g',G(2),'b',1/WR1,'y')
+bode(Q,'c',R,'g',1/WR1,'y')
 grid on
-legend('Control Sensitivity','loop transfer function','Controller','Dynamic system','1/WR1')
+legend('Control Sensitivity','Controller','1/WR1')
 title('tuning control effort limitation')
 
 % step response control variable
