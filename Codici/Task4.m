@@ -88,20 +88,20 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 
 %% nominal stability
 
-Closed_l = minreal(getIOTransfer(CL1,'phi0',{'p','phi'}));
-L = G*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
+G_n = getNominal(G);
+L = G_n*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
 L1 = tf(L);
 L2 = [ 1 , 0 ];
 L_n = L1*L2;
 I = eye(2);
 c1 = I + L_n;
-[num,den] = tfdata(c1(1,1),'v'); % extract pole polinomial of the closed and open loop
+[num,den] = tfdata(c1(1,1),'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
 disp('check if open loop poles correspond')
 pole(L)
 roots(den)
 disp('------------------------------')
 disp('check if closed loop poles correspond')
-pole(Closed_l)
+pole(CL1(2))
 roots(num)
 
 figure()
@@ -112,38 +112,42 @@ nyquistplot(minreal(c1(1,1)))
 
 %% robust stability
 
-
-R_p_c = pid(CL1.Blocks.rrate);
-R_phi_c = pid(CL1.Blocks.rangle);
-
-R_p_c.InputName = {'ep'};
-R_p_c.OutputName = {'DELTA_{lat}'};
-
-R_phi_c.InputName = {'ephi'};
-R_phi_c.OutputName = {'p0'};
-
-
-CL1_unc = connect(SYS,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'}); % tuned uncertain model
-[M,Delta] = lftdata(CL1_unc); % m-delta form
-
-M.InputName = {'w1','w2','w3','w4','phi0'};
-M.OutputName = {'z1','z2','z3','z4','p','phi'};
-% Delta.InputName = {'z1','z2','z3','z4'};
+% R_p_c = pid(CL1.Blocks.rrate);
+% R_phi_c = pid(CL1.Blocks.rangle);
+% 
+% R_p_c.InputName = {'ep'};
+% R_p_c.OutputName = {'DELTA_{lat}'};
+% 
+% R_phi_c.InputName = {'ephi'};
+% R_phi_c.OutputName = {'p0'};
+% 
+% 
+% CL1_unc = connect(SYS,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'}); % tuned uncertain model
+% [M,Delta] = lftdata(CL1_unc); % m-delta form
+% 
+% M.InputName = {'w1','w2','w3','w4','phi0'};
+% M.OutputName = {'z1','z2','z3','z4','p','phi'};
+% % Delta.InputName = {'z1','z2','z3','z4'};
 % Delta.OutputName = {'w1','w2','w3','w4'};
 % CL1_mdelta = connect(tf(Delta),M,'phi0',{'p','phi'});
 % M2 = tf(M);
 % M1 = [ 1 , 0 ];
 %M = M2*M1;
 % s = svd(M);
-[sv,wfreq]=sigma(tf(M));
+% [sv,wfreq]=sigma(tf(M));
+% 
+% figure()
+% sigma(tf(M))
+F = minreal(getIOTransfer(CL1,'phi0','phi'));
+W = ( tf(SYS) - G_n(2)) / G(2) ;
+figure(30)
+bode(F,1/W)
 
-figure()
-sigma(tf(M))
+
 
 
 %% plt sensitivity, loop transfer function, 1/WR
 
-F = minreal(getIOTransfer(CL1,'phi0',{'p','phi'}));
 
 % plot sensitivity
 
