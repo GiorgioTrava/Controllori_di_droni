@@ -123,21 +123,22 @@ R_phi_c.InputName = {'ephi'};
 R_phi_c.OutputName = {'p0'};
 
 
-CL1_unc = connect(G,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'});
+CL1_unc = connect(SYS,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'}); % tuned uncertain model
 [M,Delta] = lftdata(CL1_unc); % m-delta form
-M.InputName = {'w','phi0'};
-M.OutputName = {'z','p','phi'};
-Delta.InputName = {'z'};
-Delta.OutputName = {'w'};
-CL1_mdelta = connect(Delta,M,'phi0',{'p','phi'});
-M2 = tf(M);
-M1 = [ 1 , 0 ];
+
+M.InputName = {'w1','w2','w3','w4','phi0'};
+M.OutputName = {'z1','z2','z3','z4','p','phi'};
+% Delta.InputName = {'z1','z2','z3','z4'};
+% Delta.OutputName = {'w1','w2','w3','w4'};
+% CL1_mdelta = connect(tf(Delta),M,'phi0',{'p','phi'});
+% M2 = tf(M);
+% M1 = [ 1 , 0 ];
 %M = M2*M1;
 % s = svd(M);
-[sv,wfreq]=sigma(M);
+[sv,wfreq]=sigma(tf(M));
 
 figure()
-bode(CL1_unc,CL1_mdelta)
+sigma(tf(M))
 
 
 %% plt sensitivity, loop transfer function, 1/WR

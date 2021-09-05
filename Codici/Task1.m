@@ -8,12 +8,12 @@ clc, clear, close all
 % level of uncertainty, the standard deviation on
 % Y_v, L_v, Y_delta, L_delta
 
-Y_v = ureal('Y_v',-0.264,'Percentage',4.837);
+Y_v = ureal('Y_v',-0.264,'Percentage',3*4.837);
 Y_p= 0; 
-L_v = ureal('L_v',-7.349,'Percentage',4.927);
+L_v = ureal('L_v',-7.349,'Percentage',3*4.927);
 L_p= 0;
-Y_delta = ureal('Y_delta',9.568,'Percentage',4.647);
-L_delta = ureal('L_delta',1079.339,'Percentage',2.762);
+Y_delta = ureal('Y_delta',9.568,'Percentage',3*4.647);
+L_delta = ureal('L_delta',1079.339,'Percentage',3*2.762);
 
 g = 9.807;
 
