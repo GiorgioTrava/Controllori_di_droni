@@ -20,6 +20,7 @@ denominator = [ 1 , 2*zeta*wn , wn^2];
 sys_ref = tf(numerator,denominator); % rappresenta la complementary sensitivity richiesta
 S_req = 1 - sys_ref ;
 
+
 %% Design con steptracking
 
 HardReq = TuningGoal.Poles(0,0.9,50); %bisogna capire quale wmax lasciare, per avere un sistema sensato
@@ -47,14 +48,16 @@ legend('tuned S.T.','uncontrolled')
 
 % nominal performance
 
-% wb = 10; %regolo la banda di frequenze
-% M = 1.1;  %regolo l'overshoot
-% 
-% numerator_WR = [1/M , wb];
-% denominator_WR = [1 , 0];
+zeta_wr = 0.6;
+wn_wr = 17;
+
+numerator_wr = wn_wr^2;
+denominator_wr = [ 1 , 2*zeta_wr*wn_wr , wn_wr^2];
 Wl = 1;
-% WR = tf(numerator_WR,denominator_WR); % costruisco la funzione peso
-WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
+tf_peso1 = minreal(tf(numerator_wr,denominator_wr)); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
+s_req_modified = 1.1*(1 - tf_peso1);                %*tf([1,0.8],1)*tf(1,[1,0]);                   %*tf(1,[1 , 5])*tf([1 , 13],1)*tf([1 , 13],1)*tf(1,[1 , 23.4]); % (1 - tf_peso) rappresenta la s_req sulla quale faccio le modifiche
+WR = 1/s_req_modified; % peso effettivo
+%WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
 Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
 
 % control sensitivity
@@ -64,7 +67,7 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % numerator_WR1 = [1/M1 , wb1];
 % denominator_WR1 = [1 , 0];
-WR1 = 3.35*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
+WR1 = 6*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
 % WR1 = tf( numerator_WR1 , denominator_WR1 );
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
@@ -112,38 +115,12 @@ nyquistplot(minreal(c1(1,1)))
 
 %% robust stability
 
-% R_p_c = pid(CL1.Blocks.rrate);
-% R_phi_c = pid(CL1.Blocks.rangle);
-% 
-% R_p_c.InputName = {'ep'};
-% R_p_c.OutputName = {'DELTA_{lat}'};
-% 
-% R_phi_c.InputName = {'ephi'};
-% R_phi_c.OutputName = {'p0'};
-% 
-% 
-% CL1_unc = connect(SYS,R_phi_c,R_p_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'}); % tuned uncertain model
-% [M,Delta] = lftdata(CL1_unc); % m-delta form
-% 
-% M.InputName = {'w1','w2','w3','w4','phi0'};
-% M.OutputName = {'z1','z2','z3','z4','p','phi'};
-% % Delta.InputName = {'z1','z2','z3','z4'};
-% Delta.OutputName = {'w1','w2','w3','w4'};
-% CL1_mdelta = connect(tf(Delta),M,'phi0',{'p','phi'});
-% M2 = tf(M);
-% M1 = [ 1 , 0 ];
-%M = M2*M1;
-% s = svd(M);
-% [sv,wfreq]=sigma(tf(M));
-% 
-% figure()
-% sigma(tf(M))
+G_array = usample(SYS(2),60);
 F = minreal(getIOTransfer(CL1,'phi0','phi'));
-W = ( tf(SYS) - G_n(2)) / G(2) ;
+[P , info] = ucover(G_array,SYS(2),1);
 figure(30)
-bode(F,1/W)
-
-
+bode(F,info.W1)
+legend('complementary sensitivity','weight')
 
 
 %% plt sensitivity, loop transfer function, 1/WR
@@ -154,9 +131,14 @@ bode(F,1/W)
 S = minreal(getIOTransfer( CL1,'phi0','ephi')); % sensitivity
 
 figure(8)
+
 bode(S_req,S,1/WR)
-grid on
 legend('required sensitivity','sensitivity','1/WR')
+grid on
+figure(80)
+asymp(1/WR)
+grid on
+
 
 
 %risposta a step
@@ -212,6 +194,7 @@ ylabel('amplitude')
 xlabel('time')
 title('control effort ')
 legend('input {u}','output DELTA_{lat}','output phi')
+hold off
 
 
 
