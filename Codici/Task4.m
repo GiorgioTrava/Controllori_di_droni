@@ -120,12 +120,13 @@ margin(c1)
 %% robust stability
 
 G_array = usample(SYS(2),60);
-F = minreal(getIOTransfer(CL1,'phi0','phi'));
+F = getIOTransfer(CL1,'phi0','phi');
 [P , info] = ucover(G_array,SYS(2),1);
 figure(30)
-bode(F,info.W1)
+bode(F,1/info.W1)
 legend('complementary sensitivity','weight')
-
+figure(31)
+bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r')
 
 %% plt sensitivity, loop transfer function, 1/WR
 
