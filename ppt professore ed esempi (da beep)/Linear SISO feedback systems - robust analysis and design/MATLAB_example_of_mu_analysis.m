@@ -2,7 +2,7 @@
 %   Comparison of different approaches for rubust stability analysis
 %   (including mu-analysis)
 %
-
+clear all
 
 % Definition of plant model and complementary sensitivity
 s=tf('s');
@@ -17,7 +17,7 @@ M=minreal(wI*F);
 
 % Robust stability using test for complex uncertainty
 figure(1)
-sigma(F,1/wI), grid
+%sigma(F,'b',1/wI,'r'), grid
 
 figure(2)
 sigma(M), grid

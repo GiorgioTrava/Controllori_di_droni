@@ -1,9 +1,5 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
-clc, clear, close all
-
-run Task1
-
 %% Zeros and poles map of the uncertain model
 
 P = pole(G);

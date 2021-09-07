@@ -1,9 +1,5 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
-clc, clear, close all
-
-run Task1
-run Task2
 
 %% Pid controller
 

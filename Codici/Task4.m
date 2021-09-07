@@ -1,10 +1,5 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
-clc, clear , close all
-
-run Task1
-run Task2
-run Task3
 
 %% output richiesto
 
@@ -80,8 +75,14 @@ N=0; %numero di optimizations aggiuntive partendo da valori random
 options = systuneOptions('RandomStart',N);
 [CL1 , fsoft1] = systune(sys_complete_n,Req,options); % ottimizzazione
 
-pid(CL1.Blocks.rrate)
-pid(CL1.Blocks.rangle)
+R_p_c = pid(CL1.Blocks.rrate)
+R_phi_c = pid(CL1.Blocks.rangle)
+
+R_p_c.InputName = {'ep'};
+R_p_c.OutputName = {'DELTA_{lat}'};
+
+R_phi_c.InputName = {'ephi'};
+R_phi_c.OutputName = {'p0'};
 
 settlingtime_tuned = stepinfo(CL1(2)).SettlingTime
 settlingtime_required = stepinfo(sys_ref).SettlingTime
@@ -92,12 +93,7 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 %% nominal stability
 
 G_n = getNominal(G);
-L = minreal(getIOTransfer(CL1,'ephi','phi','phi')); % loop transfer function
-% L = G_n*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
-% L1 = tf(L);
-% L2 = [ 1 , 0 ];
-% L_n = L1*L2;
-% I = eye(2);
+L = getIOTransfer(CL1,'ephi','phi','phi'); % loop transfer function
 c1 = 1 + L;
 [num,den] = tfdata(c1,'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
 disp('check if open loop poles correspond')
@@ -121,12 +117,12 @@ margin(c1)
 
 G_array = usample(SYS(2),60);
 F = getIOTransfer(CL1,'phi0','phi');
-[P , info] = ucover(G_array,SYS(2),1);
+[P , info] = ucover(G_array,SYS(2),5);
 figure(30)
 bode(F,1/info.W1)
 legend('complementary sensitivity','weight')
 figure(31)
-bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r')
+bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
 
 %% plt sensitivity, loop transfer function, 1/WR
 
