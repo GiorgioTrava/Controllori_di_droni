@@ -92,13 +92,14 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 %% nominal stability
 
 G_n = getNominal(G);
-L = G_n*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
-L1 = tf(L);
-L2 = [ 1 , 0 ];
-L_n = L1*L2;
-I = eye(2);
-c1 = I + L_n;
-[num,den] = tfdata(c1(1,1),'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
+L = minreal(getIOTransfer(CL1,'ephi','phi','phi')); % loop transfer function
+% L = G_n*tf(CL1.Blocks.rrate)*tf(CL1.Blocks.rangle); % funzione di trasferimento in anello aperto
+% L1 = tf(L);
+% L2 = [ 1 , 0 ];
+% L_n = L1*L2;
+% I = eye(2);
+c1 = 1 + L;
+[num,den] = tfdata(c1,'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
 disp('check if open loop poles correspond')
 pole(L)
 roots(den)
@@ -107,10 +108,13 @@ disp('check if closed loop poles correspond')
 pole(CL1(2))
 roots(num)
 
-figure()
-bode(minreal(c1(1,1)))
-figure
-nyquistplot(minreal(c1(1,1)))
+figure(7)
+bode(c1)
+figure(70)
+nyquistplot(c1)
+
+figure(71)
+margin(c1)
 
 
 %% robust stability
