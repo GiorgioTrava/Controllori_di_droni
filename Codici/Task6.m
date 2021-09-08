@@ -19,3 +19,34 @@ figure(300)
 sigma(bounds), grid
 
 
+W_strano(1,1) = tf(info.W1);
+W_strano(2,2) = tf(info.W2);
+W_strano.InputName = {'DELTA_{lat}'};
+W_strano.OutputName = {'z1','z2'};
+Delta = ultidyn('delta',[2,2]);
+Delta.InputName = {'z1','z2'};
+Delta.OutputName = {'w1','w2'};
+G1 = tf(SYS);
+G1.InputName = 'DELTA_{lat}';
+G1.OutputName = {'p','phi'};
+R_p_c.InputName = {'p'};
+R_p_c.OutputName = {'DELTA_{lat}'};
+R_phi_c.InputName = {'ephi'};
+R_phi_c.OutputName = {'p0'};
+
+sum_inner1 = sumblk{'ep = p - p0'};
+sum_unc = sumblk{'g_in = w1 + w2 + DELTA_{lat}'};
+
+M_delta = connect(R_phi_c,R_p_c,W_strano,Delta,G1,sum_inner1,sum_unc,{'w1','w2'},{'z1','z2'});
+
+
+
+
+
+
+
+
+
+
+
+
