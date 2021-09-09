@@ -1,3 +1,7 @@
+clc
+clear
+close all
+
 gamma = ureal('gamma',2,'Perc',30);  % uncertain gain
 
 tau = ureal('tau',1,'Perc',30);      % uncertain time-constant
@@ -30,7 +34,7 @@ figure(5), bode(minreal(Pn*Cn/(1+Pn*Cn)),1/Wt)
 N=500;
 
 for n=1:N
-    n,
+    n;
     gamma_mc(n)= 0.7*2 + (1.3-0.7)*2*rand(1,1);
     tau_mc(n)= 0.7*1 + (1.3-0.7)*1*rand(1,1);
     xi_mc(n)= 0.1 + (0.8-0.1)*rand(1,1);

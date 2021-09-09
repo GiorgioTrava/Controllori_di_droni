@@ -1,7 +1,7 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
 
-% robust stability with mu analysis
+%% robust stability with mu analysis
 
 [M , Delta, BlkStruct] = lftdata(CL1_unc);
 szDelta = size(Delta);
@@ -10,48 +10,75 @@ omega = logspace(-3,2,500);
 M11_g = frd(M11,omega);
 mubnds = mussv(M11_g,BlkStruct);
 
-Delta.InputName = {'z1','z2'};
-Delta.OutputName = {'w1','w2'};
-controllo=connect(M11,Delta,
-%M = (-tf(info.W1)*R_p_c*R_phi_c*G(2) - tf(info.W1)*R_p_c*G(1))/([1,1]' + tf(info.W1)*R_p_c*G(1)/tf(info.W1) + tf(info.W1)*R_p_c*R_phi_c*G(2)/tf(info.W1);
-% G_array_p = usample(SYS(1),60);
-% [P_p , info_p] = ucover(G_array,SYS(1),5);
-% W(1,1) = tf(info.W1);
-% W(1,2) = tf(info.W2);
-% F_mimo = getIOTransfer(CL1,'phi0',{'p','phi'});
-% M = F_mimo*W;
-% omega=logspace(-3,2,500);
-% bounds=mussv(frd(M,omega),[1 0; 1 0]);
-% 
+Deltatf = tf(Delta);
+M.InputName = {'w1','w2','w3','w4','phi0'};
+M.OutputName = {'z1','z2','z3','z4','p','phi'};
+Deltatf.InputName = {'z1','z2','z3','z4'};
+Deltatf.OutputName = {'w1','w2','w3','w4'};
+controllo = connect(M,Deltatf,'phi0',{'p','phi'});
+
+% structured singular value
+
 figure(300)
 sigma(mubnds), grid
-% 
-% 
-% W_strano(1,1) = tf(info.W1);
-% W_strano(2,2) = tf(info.W2);
-% W_strano.InputName = {'DELTA_{lat}'};
-% W_strano.OutputName = {'z1','z2'};
-% Delta = ultidyn('delta',[2,2]);
-% Delta.InputName = {'z1','z2'};
-% Delta.OutputName = {'w1','w2'};
-% G1 = tf(SYS);
-% G1.InputName = 'DELTA_{lat}';
-% G1.OutputName = {'p','phi'};
-% R_p_c.InputName = {'p'};
-% R_p_c.OutputName = {'DELTA_{lat}'};
-% R_phi_c.InputName = {'ephi'};
-% R_phi_c.OutputName = {'p0'};
-% 
-% sum_inner1 = sumblk{'ep = p - p0'};
-% sum_unc = sumblk{'g_in = w1 + w2 + DELTA_{lat}'};
-% 
-% M_delta = connect(R_phi_c,R_p_c,W_strano,Delta,G1,sum_inner1,sum_unc,{'w1','w2'},{'z1','z2'});
 
+% controllo M-Delta e sistema incerto
 
+figure(301)
+bode(controllo,'b',CL1_unc,'g')
+grid on
+title('controllo sistema ricostruito')
 
+%% montecarlo simulation
 
+n = 500;
+for i = 1:n
+    
+    Y_v_mc(i) = -0.264 + Y_v_sigma*rand(1);
+    L_v_mc(i) = -7.349 + L_v_sigma*randn(1);
+    Y_delta_mc(i) = 9.568 + Y_delta_sigma*randn(1);
+    L_delta_mc(i) = 1079.339 + L_delta_sigma*randn(1);
 
+A = [Y_v_mc(i)  Y_p  g;
+     L_v_mc(i)  L_p  0;
+      0    1   0];
+ 
+B = [Y_delta_mc(i) L_delta_mc(i) 0]';
 
+C = [0 1 0;
+     0 0 1];
+D = [0 0]';
+
+SYS_mc = ss(A,B,C,D);
+SYS_mc.StateName = {'v','p','phi'};
+SYS_mc.InputName = 'DELTA_{lat}';
+SYS_mc.OutputName = {'p','phi'};
+
+ 
+
+CL1_unc_mc = connect(tf(SYS_mc),R_p_c,R_phi_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'});
+L_mc = getIOTransfer(CL1_unc_mc,'ephi','phi','phi'); % loop transfer function
+[Gm(i),Pm(i)] = margin(L_mc);
+
+t=(0:.01:10);
+
+ y=step(CL1_unc_mc(2),t);
+    
+    S = stepinfo(y,t);
+    
+    Sett(i)=S.SettlingTime;
+    Over(i)=S.Overshoot;
+    
+
+end
+ 
+figure(51),hist(Pm,100), grid, title('Phase margin')
+
+figure(52),hist(Gm,100), grid, title('Gain margin')
+
+figure(53),hist(Sett,100), grid, title('Settling time')
+
+figure(54),hist(Over,100), grid, title('% Overshoot')
 
 
 
