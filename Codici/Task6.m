@@ -9,6 +9,10 @@ M11 = M(1:szDelta(2),1:szDelta(1));
 omega = logspace(-3,2,500);
 M11_g = frd(M11,omega);
 mubnds = mussv(M11_g,BlkStruct);
+
+Delta.InputName = {'z1','z2'};
+Delta.OutputName = {'w1','w2'};
+controllo=connect(M11,Delta,
 %M = (-tf(info.W1)*R_p_c*R_phi_c*G(2) - tf(info.W1)*R_p_c*G(1))/([1,1]' + tf(info.W1)*R_p_c*G(1)/tf(info.W1) + tf(info.W1)*R_p_c*R_phi_c*G(2)/tf(info.W1);
 % G_array_p = usample(SYS(1),60);
 % [P_p , info_p] = ucover(G_array,SYS(1),5);

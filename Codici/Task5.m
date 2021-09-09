@@ -20,7 +20,9 @@ semilogx(x,mag)
 %% ricostruzione modello incerto controllato
 
 CL1_unc = connect(SYS,R_p_c,R_phi_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'});
-
+figure(30303)
+grid on
+step(CL1_unc);
 
 
 
