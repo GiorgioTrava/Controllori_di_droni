@@ -25,7 +25,7 @@ Options = systuneOptions('Display','final');
 
 %risposta a step
 
-figure(5)
+figure(41)
 step(sys_ref)
 hold on
 step(CL(2,:))
@@ -34,13 +34,13 @@ title('step response of the tuned system with steptracking function')
 
 % mappa poli e zeri
  
-figure(6)
+figure(42)
 pzplot(CL,'r',G,'g')
 legend('tuned S.T.','uncontrolled')
 
 
 %% design , mixed sensitivity (.weightedGain)
-
+%% A
 % nominal performance
 
 zeta_wr = 0.6;
@@ -104,26 +104,26 @@ disp('check if closed loop poles correspond')
 pole(CL1(2))
 roots(num)
 
-figure(7)
+figure(43)
 bode(c1)
-figure(70)
+figure(44)
 nyquistplot(c1)
 
-figure(71)
+figure(45)
 margin(c1)
 
 
-%% robust stability
+%% C robust stability
 
 G_array = usample(SYS(2),60);
 F = getIOTransfer(CL1,'phi0','phi');
 [P , info] = ucover(G_array,SYS(2),5);
-figure(30)
+figure(46)
 bode(F,1/info.W1)
 legend('complementary sensitivity','weight')
-figure(31)
+figure(47)
 bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
-
+legend('Relative error array','Weight')
 %% plt sensitivity, loop transfer function, 1/WR
 
 
@@ -131,20 +131,19 @@ bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r') % fare una prova considerand
 
 S = minreal(getIOTransfer( CL1,'phi0','ephi')); % sensitivity
 
-figure(8)
+figure(48)
 
 bode(S_req,S,1/WR)
 legend('required sensitivity','sensitivity','1/WR')
 grid on
-figure(80)
+figure(49)
 asymp(1/WR)
 grid on
 
 
-
 %risposta a step
  
-figure(9)
+figure(410)
 grid on
 step(sys_ref)
 hold on
@@ -155,7 +154,7 @@ title('step response')
 
 % mappa poli e zeri
 
-figure(10)
+figure(411)
 pzplot(CL1,'r',G,'g')
 legend('tuned','plant')
 title('poles and zeros of the tuned system with mixed sensitivity')
@@ -165,12 +164,13 @@ title('poles and zeros of the tuned system with mixed sensitivity')
 Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}')); 
 R = minreal(getIOTransfer(CL1,'ep','DELTA_{lat}'));
 
-figure(11)
+figure(412)
 bode(Q,'c',R,'g',1/WR1,'y')
 grid on
 legend('Control Sensitivity','Controller','1/WR1')
 title('tuning control effort limitation')
 
+%% B Control effort limitation
 % step response control variable
 
 t = linspace(0,6,612);
@@ -185,7 +185,7 @@ u = u1 + u2;
 y = lsim(Q,u,t);
 y1 = lsim(CL1(2),u,t);
 
-figure(12)
+figure(413)
 plot(t,u);
 hold on
 grid on

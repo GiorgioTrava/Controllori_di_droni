@@ -10,18 +10,18 @@ x = linspace(0.001,100,10000);
 mag = squeeze(mag1) + squeeze(mag2);
 mag = mag2db(mag);
 
-figure(1110)
+figure(51)
 bodemag(WR*S + info.W1*F,'b',tf(1,1),'r');
 grid on
 hold on
 
-semilogx(x,mag)
-
+semilogx(x,mag,'g')
+legend('magnitude of sum','bound <1','sum of magnitude')
 %% ricostruzione modello incerto controllato
 
 CL1_unc = connect(SYS,R_p_c,R_phi_c,sum_inner,sum_outer,'phi0',{'p','phi'},{'ephi','phi','DELTA_{lat}','ep'});
 
-figure(30303)
+figure(52)
 grid on
 step(CL1_unc);
 
