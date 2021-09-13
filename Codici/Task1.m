@@ -4,9 +4,8 @@
 
 %% Uncertain model state space representation
 
-% The stability derivatives of the system are implemented with the required
-% level of uncertainty, the standard deviation on
-% Y_v, L_v, Y_delta, L_delta
+% Le derivate di stabilità del sistema sono implementate con il livello di
+% incertezza richiesto, la deviazione standard su Y_v, L_v, Y_delta, L_delta
 
 Y_v_sigma = 0.04837*0.264;
 Y_v = ureal('Y_v',-0.264,'PlusMinus',[-3*Y_v_sigma,3*Y_v_sigma]);
@@ -31,7 +30,7 @@ C = [0 1 0;
      0 0 1];
 D = [0 0]';
 
-SYS = ss(A,B,C,D);
+SYS = minreal(ss(A,B,C,D));
 
 SYS.StateName = {'v','p','phi'};
 SYS.InputName = 'DELTA_{lat}';

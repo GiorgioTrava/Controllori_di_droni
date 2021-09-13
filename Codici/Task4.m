@@ -16,29 +16,6 @@ sys_ref = tf(numerator,denominator); % rappresenta la complementary sensitivity 
 S_req = 1 - sys_ref ;
 
 
-%% Design con steptracking
-
-HardReq = TuningGoal.Poles(0,0.9,50); %bisogna capire quale wmax lasciare, per avere un sistema sensato
-SoftReq = TuningGoal.StepTracking('phi0','phi',sys_ref);
-Options = systuneOptions('Display','final');
-[CL , fsoft , gHard] = systune(sys_complete_n,SoftReq,HardReq,Options);
-
-%risposta a step
-
-figure(41)
-step(sys_ref)
-hold on
-step(CL(2,:))
-legend('reference system','tuned system')
-title('step response of the tuned system with steptracking function')
-
-% mappa poli e zeri
- 
-figure(42)
-pzplot(CL,'r',G,'g')
-legend('tuned S.T.','uncontrolled')
-
-
 %% design , mixed sensitivity (.weightedGain)
 %% A
 % nominal performance
@@ -49,7 +26,7 @@ wn_wr = 17;
 numerator_wr = wn_wr^2;
 denominator_wr = [ 1 , 2*zeta_wr*wn_wr , wn_wr^2];
 Wl = 1;
-tf_peso1 = minreal(tf(numerator_wr,denominator_wr)); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
+tf_peso1 = tf(numerator_wr,denominator_wr); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
 s_req_modified = 1.1*(1 - tf_peso1);                %*tf([1,0.8],1)*tf(1,[1,0]);                   %*tf(1,[1 , 5])*tf([1 , 13],1)*tf([1 , 13],1)*tf(1,[1 , 23.4]); % (1 - tf_peso) rappresenta la s_req sulla quale faccio le modifiche
 WR = 1/s_req_modified; % peso effettivo
 %WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
@@ -57,23 +34,15 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 
 % control sensitivity
 
-% wb1 = 8; %regolo la banda di frequenze
-% M1 = 0.3;  %regolo l'overshoot, diminuendo il valore si riscontra una diminuzione nei valori di picco di delta_lat per l'ingresso u
-
-% numerator_WR1 = [1/M1 , wb1];
-% denominator_WR1 = [1 , 0];
 WR1 = 6*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
-% WR1 = tf( numerator_WR1 , denominator_WR1 );
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
-
-
 
 % design
 
 N=0; %numero di optimizations aggiuntive partendo da valori random
 options = systuneOptions('RandomStart',N);
-[CL1 , fsoft1] = systune(sys_complete_n,Req,options); % ottimizzazione
+[CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
 
 R_p_c = pid(CL1.Blocks.rrate)
 R_phi_c = pid(CL1.Blocks.rangle)
@@ -92,7 +61,6 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 
 %% nominal stability
 
-G_n = getNominal(G);
 L = getIOTransfer(CL1,'ephi','phi','phi'); % loop transfer function
 c1 = 1 + L;
 [num,den] = tfdata(c1,'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
@@ -117,19 +85,19 @@ margin(c1)
 
 G_array = usample(SYS(2),60);
 F = getIOTransfer(CL1,'phi0','phi');
-[P , info] = ucover(G_array,SYS(2),5);
+[P_cover , info] = ucover(G_array,SYS(2),5);
 figure(46)
 bode(F,1/info.W1)
 legend('complementary sensitivity','weight')
 figure(47)
-bodemag((G_n(2)-G_array)/G_n(2), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
+bodemag((G(2)-G_array)/G(2), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
 legend('Relative error array','Weight')
 %% plt sensitivity, loop transfer function, 1/WR
 
 
 % plot sensitivity
 
-S = minreal(getIOTransfer( CL1,'phi0','ephi')); % sensitivity
+S = getIOTransfer( CL1,'phi0','ephi'); % sensitivity
 
 figure(48)
 
@@ -155,16 +123,20 @@ title('step response')
 % mappa poli e zeri
 
 figure(411)
-pzplot(CL1,'r',G,'g')
-legend('tuned','plant')
+pzplot(CL1,'r')
+legend('tuned')
 title('poles and zeros of the tuned system with mixed sensitivity')
+
+figure(412)
+pzplot(CL,'r')
+legend('poles and zeros of the tuned system with steptracking function')
 
 % plt control sensitivity
 
-Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}')); 
-R = minreal(getIOTransfer(CL1,'ep','DELTA_{lat}'));
+Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
+R = getIOTransfer(CL1,'ep','DELTA_{lat}');
 
-figure(412)
+figure(413)
 bode(Q,'c',R,'g',1/WR1,'y')
 grid on
 legend('Control Sensitivity','Controller','1/WR1')

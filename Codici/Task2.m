@@ -10,6 +10,7 @@ pzmap(SYS)
 grid on, hold on
 pzmap(G)
 legend('Uncertain poles and zeros', 'Nominal poles and zeros')
+hold off
 
 %% Bode plots
 
@@ -17,16 +18,14 @@ figure (22) %diagramma di bode del sistema incerto e nominale
 bode(SYS)
 grid on, hold on
 bode(G)
-legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+legend('Uncertain model Bode diagram', 'Nominal model Bode diagram')
+
 
 %% Nyquist plot
 
-figure (23) %diagramma di Nyquist sistema incerto e nominale
-nyquist(SYS)
-grid on, hold on
-nyquist(G)
-legend('Uncertain model Bode diagram', 'Nominalmodel Bode diagram')
+% figure (23) %diagramma di Nyquist sistema incerto e nominale
+% nyquist(SYS)
+% grid on, hold on
+% nyquist(G)
+% legend('Uncertain model', 'Nominal model')
 
-
-
-%poliezeri = zpk(SYS)
