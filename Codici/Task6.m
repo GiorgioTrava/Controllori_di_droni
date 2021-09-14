@@ -25,7 +25,7 @@ sigma(mubnds), grid
 % controllo M-Delta e sistema incerto
 
 figure(62)
-bode(controllo,'b',CL1_unc,'g')
+bode(controllo,'b',CL1_unc,'g',[10^-2,10^3])
 grid on
 title('controllo sistema ricostruito')
 legend('controllo','sistema incerto')

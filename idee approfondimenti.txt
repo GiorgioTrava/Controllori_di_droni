@@ -1,0 +1,2 @@
+1.considerazione su parametri tunnati, valori numerici
+2.stabilizzazione con solo un loop (interno)

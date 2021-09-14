@@ -26,7 +26,7 @@ wn_wr = 17;
 numerator_wr = wn_wr^2;
 denominator_wr = [ 1 , 2*zeta_wr*wn_wr , wn_wr^2];
 Wl = 1;
-tf_peso1 = tf(numerator_wr,denominator_wr); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
+tf_peso1 = minreal(tf(numerator_wr,denominator_wr)); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
 s_req_modified = 1.1*(1 - tf_peso1);                %*tf([1,0.8],1)*tf(1,[1,0]);                   %*tf(1,[1 , 5])*tf([1 , 13],1)*tf([1 , 13],1)*tf(1,[1 , 23.4]); % (1 - tf_peso) rappresenta la s_req sulla quale faccio le modifiche
 WR = 1/s_req_modified; % peso effettivo
 %WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
@@ -61,7 +61,7 @@ overshoot_required = stepinfo(sys_ref).Overshoot
 
 %% nominal stability
 
-L = getIOTransfer(CL1,'ephi','phi','phi'); % loop transfer function
+L = minreal(getIOTransfer(CL1,'ephi','phi','phi')); % loop transfer function
 c1 = 1 + L;
 [num,den] = tfdata(c1,'v'); % extract pole polinomial of the closed and open loop, c1(1,1) represent the determinant
 disp('check if open loop poles correspond')
@@ -84,13 +84,13 @@ margin(c1)
 %% C robust stability
 
 G_array = usample(SYS(2),60);
-F = getIOTransfer(CL1,'phi0','phi');
+F = minreal(getIOTransfer(CL1,'phi0','phi'));
 [P_cover , info] = ucover(G_array,SYS(2),5);
 figure(46)
 bode(F,1/info.W1)
 legend('complementary sensitivity','weight')
 figure(47)
-bodemag((G(2)-G_array)/G(2), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
+bodemag(minreal((G(2)-G_array)/G(2)), 'g', info.W1, 'r') % fare una prova considerando il loop interno come incerto
 legend('Relative error array','Weight')
 %% plt sensitivity, loop transfer function, 1/WR
 
@@ -127,22 +127,19 @@ pzplot(CL1,'r')
 legend('tuned')
 title('poles and zeros of the tuned system with mixed sensitivity')
 
-figure(412)
-pzplot(CL,'r')
-legend('poles and zeros of the tuned system with steptracking function')
-
 % plt control sensitivity
 
 Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
-R = getIOTransfer(CL1,'ep','DELTA_{lat}');
+%R = getIOTransfer(CL1,'ep','DELTA_{lat}');
 
-figure(413)
-bode(Q,'c',R,'g',1/WR1,'y')
+figure(412)
+bode(Q,'c',1/WR1,'y')
 grid on
-legend('Control Sensitivity','Controller','1/WR1')
+legend('Control Sensitivity','1/WR1')
 title('tuning control effort limitation')
 
 %% B Control effort limitation
+
 % step response control variable
 
 t = linspace(0,6,612);
