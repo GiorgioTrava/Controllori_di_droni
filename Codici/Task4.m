@@ -35,7 +35,8 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 % control sensitivity
 
 WR1 = 6*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
-Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,WR1); % qui sto imponendo il vincolo sul control effort
+Wr1 = 0.07*tf([1,20],1)*tf(1,[1,50]); % prova con filtro passa basso
+Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,Wr1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
 
 % design
@@ -129,11 +130,10 @@ title('poles and zeros of the tuned system with mixed sensitivity')
 
 % plt control sensitivity
 
-Q = getIOTransfer(CL1,'phi0','DELTA_{lat}'); 
-%R = getIOTransfer(CL1,'ep','DELTA_{lat}');
+Q = minreal(getIOTransfer(CL1,'phi0','DELTA_{lat}')); 
 
 figure(412)
-bode(Q,'c',1/WR1,'y')
+bode(Q,'c',1/Wr1,'y')
 grid on
 legend('Control Sensitivity','1/WR1')
 title('tuning control effort limitation')
@@ -145,8 +145,8 @@ title('tuning control effort limitation')
 t = linspace(0,6,612);
 tpast1 = 2;
 tpast2 = 4;
-u1 = 10*rectpuls(t - tpast1, 2);
-u2 = -10*rectpuls(t - tpast2, 2);
+u1 = (10*pi/180)*rectpuls(t - tpast1, 2);
+u2 = -(10*pi/180)*rectpuls(t - tpast2, 2);
 u = u1 + u2;
 
 %simulo con questo input

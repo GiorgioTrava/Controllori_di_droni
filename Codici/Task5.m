@@ -11,7 +11,9 @@ mag = squeeze(mag1) + squeeze(mag2);
 mag = mag2db(mag);
 
 figure(51)
-bodemag(tf(1,1),'r');
+opt = bodeoptions('cstprefs');
+opt.ylim = [-10,10];
+bodemag(tf(1,1),'r',[10^-2,10^4],opt);
 grid on
 hold on
 semilogx(x,mag,'g')
