@@ -20,8 +20,8 @@ S_req = 1 - sys_ref ;
 %% A
 % nominal performance
 
-zeta_wr = 0.6;
-wn_wr = 17;
+zeta_wr = 0.9; %prima è 0.6
+wn_wr = 10;
 
 numerator_wr = wn_wr^2;
 denominator_wr = [ 1 , 2*zeta_wr*wn_wr , wn_wr^2];
@@ -35,7 +35,7 @@ Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vinc
 % control sensitivity
 
 WR1 = 6*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
-Wr1 = 0.07*tf([1,20],1)*tf(1,[1,50]); % prova con filtro passa basso
+Wr1 = 1.4015*tf([1,50],1)*tf(1,[1,1000]); % prova con filtro passa basso
 Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,Wr1); % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
 
@@ -148,18 +148,20 @@ tpast2 = 4;
 u1 = (10*pi/180)*rectpuls(t - tpast1, 2);
 u2 = -(10*pi/180)*rectpuls(t - tpast2, 2);
 u = u1 + u2;
-
+u3 = (10)*rectpuls(t - tpast1, 2);
+u4 = -(10)*rectpuls(t - tpast2, 2);
+u_plot = u3 + u4;
 %simulo con questo input
 
 y = lsim(Q,u,t);
 y1 = lsim(CL1(2),u,t);
 
 figure(413)
-plot(t,u);
+plot(t,u_plot);
 hold on
 grid on
-plot(t,y);
-plot(t,y1);
+plot(t,rad2deg(y));
+plot(t,rad2deg(y1));
 ylabel('amplitude')
 xlabel('time')
 title('control effort ')
