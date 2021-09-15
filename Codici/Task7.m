@@ -50,3 +50,22 @@ figure(72),hist(Gm,100), grid, title('Gain margin')
 figure(73),hist(Sett,100), grid, title('Settling time')
 
 figure(74),hist(Over,100), grid, title('% Overshoot')
+
+%% prova controllo solo con il pid
+
+sys_no_ol = minreal(getIOTransfer(CL1_unc,'phi0',{'p','phi'})); % apro il loop esterno con l'analysis point
+figure(75)
+step(sys_no_ol,'b')
+
+%si osserva che il sistema risulta stabile anche aprendo il loop esterno,
+%per cui il pid su ep sarebbe stato sufficiente per la stabilizzazione
+
+
+
+
+
+
+
+
+
+
