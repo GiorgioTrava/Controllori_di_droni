@@ -86,8 +86,9 @@ inner_loop = connect(G,R_p_c,sum_inner,'p0',{'p','phi'},{'DELTA_{lat}','ep'});
 figure(444)
 nyquistplot(inner_loop)
 
-figure(455)
-margin(inner_loop)
+figure(445)
+step(inner_loop(1))
+
 %% C robust stability
 
 G_array = usample(SYS(2),60);
