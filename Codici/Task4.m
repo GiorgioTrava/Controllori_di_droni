@@ -20,23 +20,21 @@ S_req = 1 - sys_ref ;
 %% A
 % nominal performance
 
-zeta_wr = 0.6; %prima è 0.6
+zeta_wr = 0.6; 
 wn_wr = 10;
-
 numerator_wr = wn_wr^2;
 denominator_wr = [ 1 , 2*zeta_wr*wn_wr , wn_wr^2];
 Wl = 1;
-tf_peso1 = minreal(tf(numerator_wr,denominator_wr)); % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
-s_req_modified = 1.1*(1 - tf_peso1);                %*tf([1,0.8],1)*tf(1,[1,0]);                   %*tf(1,[1 , 5])*tf([1 , 13],1)*tf([1 , 13],1)*tf(1,[1 , 23.4]); % (1 - tf_peso) rappresenta la s_req sulla quale faccio le modifiche
+tf_peso1 = minreal(tf(numerator_wr,denominator_wr));                                 % costruisco la funzione peso sulla base della f_req, poi la modifico opportunamente
+s_req_modified = 1.1*(1 - tf_peso1);                                                  % (1 - tf_peso) rappresenta la s_req sulla quale faccio le modifiche
 WR = 1/s_req_modified; % peso effettivo
-%WR = (1/S_req); % costruisco la funzione peso sulla base della sensitivity richiesta
-Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR); % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
+Req1 = TuningGoal.WeightedGain('phi0','ephi',Wl,WR);                                   % qui sto imponendo il vincolo sulla nominal performance tramite la sensitivity
 
 % control sensitivity
 
 %Wr1 = 1.5*tf( 1 , 1 ); % prova con funzione peso costante in frequenza
-Wr1 = 0.0727*tf([0.1,1],1)*tf([0.1,1],1)*tf(1,[0.0143,1])*tf(1,[0.0143,1]);%*tf(1,[0.001,1]); % prova con filtro passa basso
-Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,Wr1); % qui sto imponendo il vincolo sul control effort
+Wr1 = 0.0727*tf([0.1,1],1)*tf([0.1,1],1)*tf(1,[0.0143,1])*tf(1,[0.0143,1]);           % prova con filtro passa basso
+Req2 = TuningGoal.WeightedGain('phi0','DELTA_{lat}',Wl,Wr1);                          % qui sto imponendo il vincolo sul control effort
 Req = [ Req1 , Req2 ]; % vettore dei requirements
 
 % design
@@ -74,12 +72,12 @@ pole(CL1(2))
 roots(num)
 
 figure(43)
-bode(c1)
+bode(L)
 figure(44)
-nyquistplot(c1)
+nyquistplot(L)
 
 figure(45)
-margin(c1)
+margin(L)
 
 
 %% C robust stability

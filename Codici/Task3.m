@@ -1,7 +1,7 @@
 %% AEROSPACE CONTROL SYSTEMS %%
 
 
-%% Pid controller
+%% Controllers
 
 
 R_p = tunablePID('rrate','PID');
@@ -14,7 +14,7 @@ R_phi.InputName = {'ephi'};
 R_phi.OutputName = {'p0'};
 
 
-%% costruisco il sistema a blocchi
+%% sistema a blocchi
 
 
 sum_inner = sumblk('ep = p0 - p',1);

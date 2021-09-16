@@ -5,7 +5,7 @@
 n = 500;
 for i = 1:n
     
-    Y_v_mc(i) = -0.264 + Y_v_sigma*rand(1);
+    Y_v_mc(i) = -0.264 + Y_v_sigma*randn(1);
     L_v_mc(i) = -7.349 + L_v_sigma*randn(1);
     Y_delta_mc(i) = 9.568 + Y_delta_sigma*randn(1);
     L_delta_mc(i) = 1079.339 + L_delta_sigma*randn(1);
@@ -55,7 +55,7 @@ figure(74),hist(Over,100), grid, title('% Overshoot')
 
 sys_no_ol = minreal(getIOTransfer(CL1_unc,'phi0',{'p','phi'})); % apro il loop esterno con l'analysis point
 figure(75)
-step(sys_no_ol,'b')
+step(sys_no_ol,'r',2)
 
 %si osserva che il sistema risulta stabile anche aprendo il loop esterno,
 %per cui il pid su ep sarebbe stato sufficiente per la stabilizzazione
