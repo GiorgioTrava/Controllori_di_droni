@@ -39,7 +39,7 @@ Req = [ Req1 , Req2 ]; % vettore dei requirements
 
 % design
 
-N=0; %numero di optimizations aggiuntive partendo da valori random
+N=1; %numero di optimizations aggiuntive partendo da valori random
 options = systuneOptions('RandomStart',N);
 [CL1 , fsoft1] = systune(sys_complete,Req,options); % ottimizzazione
 
