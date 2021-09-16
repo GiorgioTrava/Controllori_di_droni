@@ -80,13 +80,14 @@ figure(45)
 margin(L)
 
 %
-L_pi = minreal(getIOTransfer(CL1,'ephi','p','phi'));
+
+inner_loop = connect(G,R_p_c,sum_inner,'p0',{'p','phi'},{'DELTA_{lat}','ep'});
 
 figure(444)
-nyquistplot(L_pi)
+nyquistplot(inner_loop)
 
 figure(455)
-margin(L_pi)
+margin(inner_loop)
 %% C robust stability
 
 G_array = usample(SYS(2),60);
