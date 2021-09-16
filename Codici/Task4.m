@@ -79,7 +79,14 @@ nyquistplot(L)
 figure(45)
 margin(L)
 
+%
+L_pi = minreal(getIOTransfer(CL1,'ephi','p','phi'));
 
+figure(444)
+nyquistplot(L_pi)
+
+figure(455)
+margin(L_pi)
 %% C robust stability
 
 G_array = usample(SYS(2),60);
