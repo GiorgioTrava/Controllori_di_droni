@@ -30,7 +30,8 @@ grid on
 title('controllo sistema ricostruito')
 legend('controllo','sistema incerto')
 
-
+figure(63)
+sigma(tf(Delta))
 
 
 
